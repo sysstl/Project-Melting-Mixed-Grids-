@@ -14,7 +14,7 @@ string ConvertNumToStringint(int i)
 	snprintf(str, length + 1, "%i", i + 1);
 	for (int j = 0; j < length; j++)
 	{
-		tmp_num_line.push_back(str[j]); // номер столбца
+		tmp_num_line.push_back(str[j]); // РЅРѕРјРµСЂ СЃС‚РѕР»Р±С†Р°
 	}
 
 	return tmp_num_line;
@@ -29,7 +29,7 @@ string ConvertNumToStringint_1(int i)
 	snprintf(str, length + 1, "%i", i);
 	for (int j = 0; j < length; j++)
 	{
-		tmp_num_line.push_back(str[j]); // номер столбца
+		tmp_num_line.push_back(str[j]); // РЅРѕРјРµСЂ СЃС‚РѕР»Р±С†Р°
 	}
 
 	return tmp_num_line;
@@ -44,7 +44,7 @@ string ConvertNumToStringdouble_gnuplot(double i)
 	snprintf(str, length + 1, "%lf", i);
 	for (int j = 0; j < length; j++)
 	{
-		tmp_num_line.push_back(str[j]); // номер столбца
+		tmp_num_line.push_back(str[j]); // РЅРѕРјРµСЂ СЃС‚РѕР»Р±С†Р°
 	}
 
 	return tmp_num_line;
@@ -74,15 +74,15 @@ GnuPlot::GnuPlot(int number_of_plots_)
 		string file_name = "gnuplot" + text + ".txt";
 		text.clear();
 		filename.push_back(file_name);
-		file.emplace_back(ofstream{ file_name }); // создаие потока вывода в файл и самого файла дл записи туда данных и ео открытие file.open(filename);
-		gnuplotPipe_tmp = new FILE; // создание файла дл гнуплота чтобы записывать туда комады дл гнуплота
-		gnuplotPipe.push_back(gnuplotPipe_tmp); // вектор файлов
-		gnuplotPipe[i] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот и свзываем его с его же файлом  (файл системный в который записываются команды для гнуплота)
+		file.emplace_back(ofstream{ file_name }); // СЃРѕР·РґР°РёРµ РїРѕС‚РѕРєР° РІС‹РІРѕРґР° РІ С„Р°Р№Р» Рё СЃР°РјРѕРіРѕ С„Р°Р№Р»Р° РґР» Р·Р°РїРёСЃРё С‚СѓРґР° РґР°РЅРЅС‹С… Рё РµРѕ РѕС‚РєСЂС‹С‚РёРµ file.open(filename);
+		gnuplotPipe_tmp = new FILE; // СЃРѕР·РґР°РЅРёРµ С„Р°Р№Р»Р° РґР» РіРЅСѓРїР»РѕС‚Р° С‡С‚РѕР±С‹ Р·Р°РїРёСЃС‹РІР°С‚СЊ С‚СѓРґР° РєРѕРјР°РґС‹ РґР» РіРЅСѓРїР»РѕС‚Р°
+		gnuplotPipe.push_back(gnuplotPipe_tmp); // РІРµРєС‚РѕСЂ С„Р°Р№Р»РѕРІ
+		gnuplotPipe[i] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚ Рё СЃРІР·С‹РІР°РµРј РµРіРѕ СЃ РµРіРѕ Р¶Рµ С„Р°Р№Р»РѕРј  (С„Р°Р№Р» СЃРёСЃС‚РµРјРЅС‹Р№ РІ РєРѕС‚РѕСЂС‹Р№ Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєРѕРјР°РЅРґС‹ РґР»СЏ РіРЅСѓРїР»РѕС‚Р°)
 		P_xyzt.push_back(matr);
 
-		gnuplotPipe_tmp_Gif = new FILE; // создание файла дл гнуплота чтобы записывать туда комады дл гнуплота
-		gnuplotPipe_Gif.push_back(gnuplotPipe_tmp_Gif); // вектор файлов
-		gnuplotPipe_Gif[i] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот и свзываем его с его же файлом  (файл системный в который записываются команды для гнуплота)
+		gnuplotPipe_tmp_Gif = new FILE; // СЃРѕР·РґР°РЅРёРµ С„Р°Р№Р»Р° РґР» РіРЅСѓРїР»РѕС‚Р° С‡С‚РѕР±С‹ Р·Р°РїРёСЃС‹РІР°С‚СЊ С‚СѓРґР° РєРѕРјР°РґС‹ РґР» РіРЅСѓРїР»РѕС‚Р°
+		gnuplotPipe_Gif.push_back(gnuplotPipe_tmp_Gif); // РІРµРєС‚РѕСЂ С„Р°Р№Р»РѕРІ
+		gnuplotPipe_Gif[i] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚ Рё СЃРІР·С‹РІР°РµРј РµРіРѕ СЃ РµРіРѕ Р¶Рµ С„Р°Р№Р»РѕРј  (С„Р°Р№Р» СЃРёСЃС‚РµРјРЅС‹Р№ РІ РєРѕС‚РѕСЂС‹Р№ Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєРѕРјР°РЅРґС‹ РґР»СЏ РіРЅСѓРїР»РѕС‚Р°)
 		P_xyzt_Gif.push_back(matr);
 	}
 }
@@ -98,7 +98,7 @@ GnuPlot::GnuPlot(int number_of_plots_, int count_frame_)
 	string text;
 	FILE* gnuplotPipe_tmp_Gif;
 	FILE* gnuplotPipe_tmp;
-	for (int i = 0; i < number_of_plots; ++i)// цикл для создания системных файлов и файлов для данных для статических картинок
+	for (int i = 0; i < number_of_plots; ++i)// С†РёРєР» РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СЃРёСЃС‚РµРјРЅС‹С… С„Р°Р№Р»РѕРІ Рё С„Р°Р№Р»РѕРІ РґР»СЏ РґР°РЅРЅС‹С… РґР»СЏ СЃС‚Р°С‚РёС‡РµСЃРєРёС… РєР°СЂС‚РёРЅРѕРє
 	{
 		int length = snprintf(NULL, 0, "%i", i);
 		char* str = new char[length + 1];
@@ -110,17 +110,17 @@ GnuPlot::GnuPlot(int number_of_plots_, int count_frame_)
 		string file_name = "gnuplot" + text + ".txt";
 		text.clear();
 		filename.push_back(file_name);
-		file.emplace_back(ofstream{ file_name }); // создаие потока вывода в файл и самого файла дл записи туда данных и ео открытие file.open(filename);
+		file.emplace_back(ofstream{ file_name }); // СЃРѕР·РґР°РёРµ РїРѕС‚РѕРєР° РІС‹РІРѕРґР° РІ С„Р°Р№Р» Рё СЃР°РјРѕРіРѕ С„Р°Р№Р»Р° РґР» Р·Р°РїРёСЃРё С‚СѓРґР° РґР°РЅРЅС‹С… Рё РµРѕ РѕС‚РєСЂС‹С‚РёРµ file.open(filename);
 
-		gnuplotPipe_tmp = new FILE; // создание файла дл гнуплота чтобы записывать туда комады дл гнуплота
-		gnuplotPipe.push_back(gnuplotPipe_tmp); // вектор файлов
-		gnuplotPipe[i] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот и свзываем его с его же файлом  (файл системный в который записываются команды для гнуплота)
+		gnuplotPipe_tmp = new FILE; // СЃРѕР·РґР°РЅРёРµ С„Р°Р№Р»Р° РґР» РіРЅСѓРїР»РѕС‚Р° С‡С‚РѕР±С‹ Р·Р°РїРёСЃС‹РІР°С‚СЊ С‚СѓРґР° РєРѕРјР°РґС‹ РґР» РіРЅСѓРїР»РѕС‚Р°
+		gnuplotPipe.push_back(gnuplotPipe_tmp); // РІРµРєС‚РѕСЂ С„Р°Р№Р»РѕРІ
+		gnuplotPipe[i] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚ Рё СЃРІР·С‹РІР°РµРј РµРіРѕ СЃ РµРіРѕ Р¶Рµ С„Р°Р№Р»РѕРј  (С„Р°Р№Р» СЃРёСЃС‚РµРјРЅС‹Р№ РІ РєРѕС‚РѕСЂС‹Р№ Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєРѕРјР°РЅРґС‹ РґР»СЏ РіРЅСѓРїР»РѕС‚Р°)
 		P_xyzt.push_back(matr);
 	}
 
 	if (count_frame != 0)
 	{
-		for (int i = 0; i < number_of_plots; ++i)// цикл для создания системных файлов и файлов для данных для Анимации
+		for (int i = 0; i < number_of_plots; ++i)// С†РёРєР» РґР»СЏ СЃРѕР·РґР°РЅРёСЏ СЃРёСЃС‚РµРјРЅС‹С… С„Р°Р№Р»РѕРІ Рё С„Р°Р№Р»РѕРІ РґР»СЏ РґР°РЅРЅС‹С… РґР»СЏ РђРЅРёРјР°С†РёРё
 		{
 			string type_plot_Gif;
 			string file_name;
@@ -151,15 +151,15 @@ GnuPlot::GnuPlot(int number_of_plots_, int count_frame_)
 
 				//v1[j] = ofstream{ file_name };
 				//v1.emplace_back(ofstream{ file_name });
-				///file_Gif.emplace_back(ofstream{ file_name }); // создаие потока вывода в файл и самого файла дл записи туда данных и ео открытие file.open(filename);
-				//file_Gif.push_back(ofstream{ file_name }); // создаие потока вывода в файл и самого файла дл записи туда данных и ео открытие file.open(filename);
+				///file_Gif.emplace_back(ofstream{ file_name }); // СЃРѕР·РґР°РёРµ РїРѕС‚РѕРєР° РІС‹РІРѕРґР° РІ С„Р°Р№Р» Рё СЃР°РјРѕРіРѕ С„Р°Р№Р»Р° РґР» Р·Р°РїРёСЃРё С‚СѓРґР° РґР°РЅРЅС‹С… Рё РµРѕ РѕС‚РєСЂС‹С‚РёРµ file.open(filename);
+				//file_Gif.push_back(ofstream{ file_name }); // СЃРѕР·РґР°РёРµ РїРѕС‚РѕРєР° РІС‹РІРѕРґР° РІ С„Р°Р№Р» Рё СЃР°РјРѕРіРѕ С„Р°Р№Р»Р° РґР» Р·Р°РїРёСЃРё С‚СѓРґР° РґР°РЅРЅС‹С… Рё РµРѕ РѕС‚РєСЂС‹С‚РёРµ file.open(filename);
 			}
 
-			//file_Gif.emplace_back(ofstream{ type_plot_Gif }); // создаие потока вывода в файл и самого файла дл записи туда данных и ео открытие file.open(filename);
+			//file_Gif.emplace_back(ofstream{ type_plot_Gif }); // СЃРѕР·РґР°РёРµ РїРѕС‚РѕРєР° РІС‹РІРѕРґР° РІ С„Р°Р№Р» Рё СЃР°РјРѕРіРѕ С„Р°Р№Р»Р° РґР» Р·Р°РїРёСЃРё С‚СѓРґР° РґР°РЅРЅС‹С… Рё РµРѕ РѕС‚РєСЂС‹С‚РёРµ file.open(filename);
 			type_plot_Gif.clear();
-			gnuplotPipe_tmp_Gif = new FILE; // создание файла дл гнуплота чтобы записывать туда комады дл гнуплота
-			gnuplotPipe_Gif.push_back(gnuplotPipe_tmp_Gif); // вектор файлов
-			gnuplotPipe_Gif[i] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот и свзываем его с его же файлом  (файл системный в который записываются команды для гнуплота)
+			gnuplotPipe_tmp_Gif = new FILE; // СЃРѕР·РґР°РЅРёРµ С„Р°Р№Р»Р° РґР» РіРЅСѓРїР»РѕС‚Р° С‡С‚РѕР±С‹ Р·Р°РїРёСЃС‹РІР°С‚СЊ С‚СѓРґР° РєРѕРјР°РґС‹ РґР» РіРЅСѓРїР»РѕС‚Р°
+			gnuplotPipe_Gif.push_back(gnuplotPipe_tmp_Gif); // РІРµРєС‚РѕСЂ С„Р°Р№Р»РѕРІ
+			gnuplotPipe_Gif[i] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚ Рё СЃРІР·С‹РІР°РµРј РµРіРѕ СЃ РµРіРѕ Р¶Рµ С„Р°Р№Р»РѕРј  (С„Р°Р№Р» СЃРёСЃС‚РµРјРЅС‹Р№ РІ РєРѕС‚РѕСЂС‹Р№ Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєРѕРјР°РЅРґС‹ РґР»СЏ РіРЅСѓРїР»РѕС‚Р°)
 			P_xyzt_Gif.push_back(matr);
 		}
 	}
@@ -171,9 +171,9 @@ GnuPlot::GnuPlot(int number_of_plots_, vector<string> filename_)
 	FILE* gnuplotPipe_tmp;
 	for (int i = 0; i < number_of_plots; ++i)
 	{
-		gnuplotPipe_tmp = new FILE; // создание файла дл гнуплота чтобы записывать туда комады дл гнуплота
-		gnuplotPipe.push_back(gnuplotPipe_tmp); // вектор файлов
-		gnuplotPipe[i] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот и свзываем его с его же файлом (файл системный в который записываются команды для гнуплота)
+		gnuplotPipe_tmp = new FILE; // СЃРѕР·РґР°РЅРёРµ С„Р°Р№Р»Р° РґР» РіРЅСѓРїР»РѕС‚Р° С‡С‚РѕР±С‹ Р·Р°РїРёСЃС‹РІР°С‚СЊ С‚СѓРґР° РєРѕРјР°РґС‹ РґР» РіРЅСѓРїР»РѕС‚Р°
+		gnuplotPipe.push_back(gnuplotPipe_tmp); // РІРµРєС‚РѕСЂ С„Р°Р№Р»РѕРІ
+		gnuplotPipe[i] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚ Рё СЃРІР·С‹РІР°РµРј РµРіРѕ СЃ РµРіРѕ Р¶Рµ С„Р°Р№Р»РѕРј (С„Р°Р№Р» СЃРёСЃС‚РµРјРЅС‹Р№ РІ РєРѕС‚РѕСЂС‹Р№ Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєРѕРјР°РЅРґС‹ РґР»СЏ РіРЅСѓРїР»РѕС‚Р°)
 		filename = filename_;
 	}
 }
@@ -182,19 +182,19 @@ GnuPlot::GnuPlot(vector<string> filename_)
 {
 	number_of_plots = 1;
 	FILE* gnuplotPipe_tmp;
-	gnuplotPipe_tmp = new FILE; // создание файла дл гнуплота чтобы записывать туда комады дл гнуплота
-	gnuplotPipe.push_back(gnuplotPipe_tmp); // вектор файлов
-	gnuplotPipe[0] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот и свзываем его с его же файлом (файл системный в который записываются команды для гнуплота)
+	gnuplotPipe_tmp = new FILE; // СЃРѕР·РґР°РЅРёРµ С„Р°Р№Р»Р° РґР» РіРЅСѓРїР»РѕС‚Р° С‡С‚РѕР±С‹ Р·Р°РїРёСЃС‹РІР°С‚СЊ С‚СѓРґР° РєРѕРјР°РґС‹ РґР» РіРЅСѓРїР»РѕС‚Р°
+	gnuplotPipe.push_back(gnuplotPipe_tmp); // РІРµРєС‚РѕСЂ С„Р°Р№Р»РѕРІ
+	gnuplotPipe[0] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚ Рё СЃРІР·С‹РІР°РµРј РµРіРѕ СЃ РµРіРѕ Р¶Рµ С„Р°Р№Р»РѕРј (С„Р°Р№Р» СЃРёСЃС‚РµРјРЅС‹Р№ РІ РєРѕС‚РѕСЂС‹Р№ Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєРѕРјР°РЅРґС‹ РґР»СЏ РіРЅСѓРїР»РѕС‚Р°)
 	filename = filename_;
 
-	gnuplotPipe_Gif.push_back(gnuplotPipe_tmp); // вектор файлов
-	gnuplotPipe_Gif[0] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот и свзываем его с его же файлом (файл системный в который записываются команды для гнуплота)
+	gnuplotPipe_Gif.push_back(gnuplotPipe_tmp); // РІРµРєС‚РѕСЂ С„Р°Р№Р»РѕРІ
+	gnuplotPipe_Gif[0] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚ Рё СЃРІР·С‹РІР°РµРј РµРіРѕ СЃ РµРіРѕ Р¶Рµ С„Р°Р№Р»РѕРј (С„Р°Р№Р» СЃРёСЃС‚РµРјРЅС‹Р№ РІ РєРѕС‚РѕСЂС‹Р№ Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєРѕРјР°РЅРґС‹ РґР»СЏ РіРЅСѓРїР»РѕС‚Р°)
 	filename = filename_;
 }
 
 void GnuPlot::SetParametrs2D(int Current_number_plot, int number_of_lines, int width_line, string title_plot, string xlabel, string ylabel) // Current_number_plot=0,1,2, ....
 {
-	//gnuplotPipe[Current_number_plot] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот
+	//gnuplotPipe[Current_number_plot] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚
 	//fprintf(gnuplotPipe[Current_number_plot], "set xrange [%lf:%lf]\n", 0., 50.); 
 	//fprintf(gnuplotPipe[Current_number_plot], "set yrange [%lf:%lf]\n", 0., 50.);
 
@@ -208,7 +208,7 @@ void GnuPlot::SetParametrs2D(int Current_number_plot, int number_of_lines, int w
 	}
 	string color;
 
-	for (int i = 1; i <= number_of_lines; i++) // number_of_lines - число линий на плоте, 
+	for (int i = 1; i <= number_of_lines; i++) // number_of_lines - С‡РёСЃР»Рѕ Р»РёРЅРёР№ РЅР° РїР»РѕС‚Рµ, 
 	{
 		string tmp_num_line;
 		int length = snprintf(NULL, 0, "%i", i);
@@ -216,7 +216,7 @@ void GnuPlot::SetParametrs2D(int Current_number_plot, int number_of_lines, int w
 		snprintf(str, length + 1, "%i", i);
 		for (int j = 0; j < length; j++)
 		{
-			tmp_num_line.push_back(str[j]); // номер линии это уже строка
+			tmp_num_line.push_back(str[j]); // РЅРѕРјРµСЂ Р»РёРЅРёРё СЌС‚Рѕ СѓР¶Рµ СЃС‚СЂРѕРєР°
 		}
 
 		if (i == 1)
@@ -304,10 +304,10 @@ void GnuPlot::SetParametrs2D(int Current_number_plot, int number_of_lines, int w
 	}
 
 	string title = "set title \"" + title_plot + "\"\n";
-	fprintf(gnuplotPipe[Current_number_plot], title.c_str()); //передадим текущее название плота (менть Te Ti)
+	fprintf(gnuplotPipe[Current_number_plot], title.c_str()); //РїРµСЂРµРґР°РґРёРј С‚РµРєСѓС‰РµРµ РЅР°Р·РІР°РЅРёРµ РїР»РѕС‚Р° (РјРµРЅС‚СЊ Te Ti)
 	title.clear();
 	title = "set xlabel \"" + xlabel + "\"\n";
-	fprintf(gnuplotPipe[Current_number_plot], title.c_str()); // передаем текущее название осей (подправить универсалом)
+	fprintf(gnuplotPipe[Current_number_plot], title.c_str()); // РїРµСЂРµРґР°РµРј С‚РµРєСѓС‰РµРµ РЅР°Р·РІР°РЅРёРµ РѕСЃРµР№ (РїРѕРґРїСЂР°РІРёС‚СЊ СѓРЅРёРІРµСЂСЃР°Р»РѕРј)
 	title.clear();
 	title = "set ylabel \"" + ylabel + "\"\n";
 	fprintf(gnuplotPipe[Current_number_plot], title.c_str());
@@ -328,14 +328,14 @@ void GnuPlot::SetParametrs2D(int Current_number_plot, int number_of_lines, int w
 	fprintf(gnuplotPipe[Current_number_plot], ("set term " + GetGPTerminal() + " position 0,0 size %zu,%zu\n").c_str(), GetTermnalWidth(), 415);
 	//fprintf(gnuplotPipe[Current_number_plot], "plot [][0:1] 2\n");
 	//printf("Press enter when window will appear");
-	fflush(gnuplotPipe[Current_number_plot]); // Пропихиваем данные туда
+	fflush(gnuplotPipe[Current_number_plot]); // РџСЂРѕРїРёС…РёРІР°РµРј РґР°РЅРЅС‹Рµ С‚СѓРґР°
 }
 
 void GnuPlot::SetParametrsOnPlotColor(int Current_number_plot, string title_plot, string xlabel, string ylabel, long float right_bondary_x, long float top_bondary_y) // Current_number_plot=0,1,2, ....
 {
-	//gnuplotPipe[Current_number_plot] = _popen(GetGPPath().c_str(), "w"); // открываем текущий плот
+	//gnuplotPipe[Current_number_plot] = _popen(GetGPPath().c_str(), "w"); // РѕС‚РєСЂС‹РІР°РµРј С‚РµРєСѓС‰РёР№ РїР»РѕС‚
 	fprintf(gnuplotPipe_Gif[Current_number_plot], "reset\n");
-	// вместе с русской кодировкой
+	// РІРјРµСЃС‚Рµ СЃ СЂСѓСЃСЃРєРѕР№ РєРѕРґРёСЂРѕРІРєРѕР№
 	/*string stroka1 = ConvertNumToStringdouble_gnuplot(0.);
 	string stroka2 = ConvertNumToStringdouble_gnuplot(right_bondary_x);
 	string stroka3 = ConvertNumToStringdouble_gnuplot(0.);
@@ -378,7 +378,7 @@ void GnuPlot::SetParametrsOnPlotColor(int Current_number_plot, string title_plot
 	fprintf(gnuplotPipe[Current_number_plot], ("set term " + GetGPTerminal() + " position 0,0 size %zu,%zu\n").c_str(), GetTermnalWidth(), 415);
 	//fprintf(gnuplotPipe[Current_number_plot], "plot [][0:1] 2\n");
 	//printf("Press enter when window will appear");
-	fflush(gnuplotPipe[Current_number_plot]); // Пропихиваем данные туда
+	fflush(gnuplotPipe[Current_number_plot]); // РџСЂРѕРїРёС…РёРІР°РµРј РґР°РЅРЅС‹Рµ С‚СѓРґР°
 }
 
 void GnuPlot::SetGridOnPlot2D(int Current_number_plot, int Nx, int Ny, double dx, double dy, int number_of_lines, Profile prof)
@@ -386,8 +386,8 @@ void GnuPlot::SetGridOnPlot2D(int Current_number_plot, int Nx, int Ny, double dx
 	if (prof == fun_on_x)
 	{
 		//Matrix mtr1(Nx, number_of_lines + 1);
-		//P_xyzt[Current_number_plot] = mtr1; // рабочий вариант
-		P_xyzt[Current_number_plot].Resize(Nx, number_of_lines + 1);// если out of range  будет то еще на 1 добавим
+		//P_xyzt[Current_number_plot] = mtr1; // СЂР°Р±РѕС‡РёР№ РІР°СЂРёР°РЅС‚
+		P_xyzt[Current_number_plot].Resize(Nx, number_of_lines + 1);// РµСЃР»Рё out of range  Р±СѓРґРµС‚ С‚Рѕ РµС‰Рµ РЅР° 1 РґРѕР±Р°РІРёРј
 
 		for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
 		{
@@ -411,8 +411,8 @@ void GnuPlot::SetGridOnPlot3D(int Current_number_plot, int Nx, int Ny, int Nz, d
 	if (prof == fun_on_x)
 	{
 		//Matrix mtr1(Nx, number_of_lines + 1);
-		//P_xyzt[Current_number_plot] = mtr1; // рабочий вариант
-		P_xyzt[Current_number_plot].Resize(Nx, number_of_lines + 1);// если out of range  будет то еще на 1 добавим
+		//P_xyzt[Current_number_plot] = mtr1; // СЂР°Р±РѕС‡РёР№ РІР°СЂРёР°РЅС‚
+		P_xyzt[Current_number_plot].Resize(Nx, number_of_lines + 1);// РµСЃР»Рё out of range  Р±СѓРґРµС‚ С‚Рѕ РµС‰Рµ РЅР° 1 РґРѕР±Р°РІРёРј
 
 		for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
 		{
@@ -422,7 +422,7 @@ void GnuPlot::SetGridOnPlot3D(int Current_number_plot, int Nx, int Ny, int Nz, d
 
 		if (count_frame != 0)
 		{
-			P_xyzt_Gif[Current_number_plot].Resize(Nx, number_of_lines + 1);// если out of range  будет то еще на 1 добавим
+			P_xyzt_Gif[Current_number_plot].Resize(Nx, number_of_lines + 1);// РµСЃР»Рё out of range  Р±СѓРґРµС‚ С‚Рѕ РµС‰Рµ РЅР° 1 РґРѕР±Р°РІРёРј
 
 			for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
 			{
@@ -475,9 +475,9 @@ void GnuPlot::SetGridOnPlot3D(int Current_number_plot, int Nx, int Ny, int Nz, d
 
 void GnuPlot::SetDataOnPlot1D(int Current_number_plot, int Nx, double dx, double** fun_dimensionless, double parametr_for_dimension, int moment_of_time, double dt, Profile prof)
 {
-	if (prof == fun_on_x) // current_number_of_line должа начинатс с 1 
-	{ // такого плана графики лучше создавать на последих по номеру плотах т.к. мб поадобитс закрытие файлов предыдущих плотов 
-		P_xyzt[Current_number_plot].Resize(Nx, moment_of_time + 1);// если out of range  будет то еще на 1 добавим
+	if (prof == fun_on_x) // current_number_of_line РґРѕР»Р¶Р° РЅР°С‡РёРЅР°С‚СЃ СЃ 1 
+	{ // С‚Р°РєРѕРіРѕ РїР»Р°РЅР° РіСЂР°С„РёРєРё Р»СѓС‡С€Рµ СЃРѕР·РґР°РІР°С‚СЊ РЅР° РїРѕСЃР»РµРґРёС… РїРѕ РЅРѕРјРµСЂСѓ РїР»РѕС‚Р°С… С‚.Рє. РјР± РїРѕР°РґРѕР±РёС‚СЃ Р·Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»РѕРІ РїСЂРµРґС‹РґСѓС‰РёС… РїР»РѕС‚РѕРІ 
+		P_xyzt[Current_number_plot].Resize(Nx, moment_of_time + 1);// РµСЃР»Рё out of range  Р±СѓРґРµС‚ С‚Рѕ РµС‰Рµ РЅР° 1 РґРѕР±Р°РІРёРј
 
 		for (size_t j = 0; j < P_xyzt[Current_number_plot].GetRows(); j++)
 		{
@@ -499,7 +499,7 @@ void GnuPlot::SetDataOnPlot1D(int Current_number_plot, int Nx, double dx, double
 
 	if (prof == fun_on_t)
 	{
-		P_xyzt[Current_number_plot].Resize(moment_of_time + 1, Nx);// если out of range  будет то еще на 1 добавим
+		P_xyzt[Current_number_plot].Resize(moment_of_time + 1, Nx);// РµСЃР»Рё out of range  Р±СѓРґРµС‚ С‚Рѕ РµС‰Рµ РЅР° 1 РґРѕР±Р°РІРёРј
 
 		for (size_t j = 0; j < P_xyzt[Current_number_plot].GetRows(); j++)
 		{
@@ -522,8 +522,8 @@ void GnuPlot::SetDataOnPlot1D(int Current_number_plot, int Nx, double dx, double
 
 void GnuPlot::SetDataOnPlot2D(int Current_number_plot, double** fun_dimensionless, double parametr_for_dimension, int fixed_point_on_axis_x, int fixed_point_on_axis_y, int number_of_lines, int current_number_of_line, double moment_of_time, vector<double**> vec, Profile prof)
 {
-	if (prof == fun_on_x) // current_number_of_line должа начинатс с 1 
-	{ // такого плана графики лучше создавать на последих по номеру плотах т.к. мб поадобитс закрытие файлов предыдущих плотов 
+	if (prof == fun_on_x) // current_number_of_line РґРѕР»Р¶Р° РЅР°С‡РёРЅР°С‚СЃ СЃ 1 
+	{ // С‚Р°РєРѕРіРѕ РїР»Р°РЅР° РіСЂР°С„РёРєРё Р»СѓС‡С€Рµ СЃРѕР·РґР°РІР°С‚СЊ РЅР° РїРѕСЃР»РµРґРёС… РїРѕ РЅРѕРјРµСЂСѓ РїР»РѕС‚Р°С… С‚.Рє. РјР± РїРѕР°РґРѕР±РёС‚СЃ Р·Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»РѕРІ РїСЂРµРґС‹РґСѓС‰РёС… РїР»РѕС‚РѕРІ 
 		if (current_number_of_line <= number_of_lines)
 		{
 			for (size_t j = 0; j < P_xyzt[Current_number_plot].GetRows(); j++) {
@@ -566,7 +566,7 @@ void GnuPlot::SetDataOnPlot2D(int Current_number_plot, double** fun_dimensionles
 
 	if (prof == fun_on_t)
 	{
-		//  moment_of_time - размерна величина
+		//  moment_of_time - СЂР°Р·РјРµСЂРЅР° РІРµР»РёС‡РёРЅР°
 		file[Current_number_plot] << moment_of_time << "   ";
 		for (int i = 0; i < vec.size(); i++)
 		{
@@ -577,17 +577,17 @@ void GnuPlot::SetDataOnPlot2D(int Current_number_plot, double** fun_dimensionles
 }
 
 void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, double*** fun_dimensionless, double parametr_for_dimension, int fixed_point_on_axis_x, int fixed_point_on_axis_y, int fixed_point_on_axis_z, int number_of_lines, int current_number_of_line, double moment_of_time, vector<double***> vec, Profile prof)
-{//при реализации откртыть файлы (P от x сери врем) (P от z сери врем) (T от времени)
+{//РїСЂРё СЂРµР°Р»РёР·Р°С†РёРё РѕС‚РєСЂС‚С‹С‚СЊ С„Р°Р№Р»С‹ (P РѕС‚ x СЃРµСЂРё РІСЂРµРј) (P РѕС‚ z СЃРµСЂРё РІСЂРµРј) (T РѕС‚ РІСЂРµРјРµРЅРё)
 
 	string type_plot_Gif = ConvertNumToStringint(Current_number_plot - 1);
 	string current_count_frame_str = ConvertNumToStringint(current_count_frame - 1);
 	ofstream file_anim("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
 	//filename_Gif.push_back("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");//????
 
-	if (prof == fun_on_x) // current_number_of_line должа начинатс с 1 
-	{ // такого плана графики лучше создавать на последих по номеру плотах т.к. мб поадобитс закрытие файлов предыдущих плотов 
+	if (prof == fun_on_x) // current_number_of_line РґРѕР»Р¶Р° РЅР°С‡РёРЅР°С‚СЃ СЃ 1 
+	{ // С‚Р°РєРѕРіРѕ РїР»Р°РЅР° РіСЂР°С„РёРєРё Р»СѓС‡С€Рµ СЃРѕР·РґР°РІР°С‚СЊ РЅР° РїРѕСЃР»РµРґРёС… РїРѕ РЅРѕРјРµСЂСѓ РїР»РѕС‚Р°С… С‚.Рє. РјР± РїРѕР°РґРѕР±РёС‚СЃ Р·Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»РѕРІ РїСЂРµРґС‹РґСѓС‰РёС… РїР»РѕС‚РѕРІ 
 
-		//для статики
+		//РґР»СЏ СЃС‚Р°С‚РёРєРё
 		if (current_number_of_line <= number_of_lines)
 		{
 			for (size_t j = 0; j < P_xyzt[Current_number_plot].GetRows(); j++) {
@@ -606,7 +606,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 			}
 		}
 
-		//для анимаци
+		//РґР»СЏ Р°РЅРёРјР°С†Рё
 		if (count_frame != 0)
 		{
 			if (current_number_of_line <= number_of_lines)
@@ -634,7 +634,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 		if (Current_number_plot == 0 || Current_number_plot == 22)
 		{
 			//ofstream file_anim("e(xy) z(index) = " + z_str + " + " + current_count_frame_str + ".txt");
-			// продолить запись профилей P(x) легенда z но для от y = Ny/2 до y = Ny/2-40 (для тепловой задачи)
+			// РїСЂРѕРґРѕР»РёС‚СЊ Р·Р°РїРёСЃСЊ РїСЂРѕС„РёР»РµР№ P(x) Р»РµРіРµРЅРґР° z РЅРѕ РґР»СЏ РѕС‚ y = Ny/2 РґРѕ y = Ny/2-40 (РґР»СЏ С‚РµРїР»РѕРІРѕР№ Р·Р°РґР°С‡Рё)
 		}
 
 		if (Current_number_plot == 17 || Current_number_plot == 23)
@@ -647,7 +647,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 
 	if (prof == fun_on_y)
 	{
-		//для статики
+		//РґР»СЏ СЃС‚Р°С‚РёРєРё
 		if (current_number_of_line <= number_of_lines)
 		{
 			for (size_t j = 0; j < P_xyzt[Current_number_plot].GetRows(); j++) {
@@ -667,7 +667,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 		}
 
 
-		//для анимаци
+		//РґР»СЏ Р°РЅРёРјР°С†Рё
 		if (count_frame != 0)
 		{
 			if (current_number_of_line <= number_of_lines)
@@ -736,7 +736,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 
 	if (prof == fun_on_t)
 	{
-		//  moment_of_time - размерна величина
+		//  moment_of_time - СЂР°Р·РјРµСЂРЅР° РІРµР»РёС‡РёРЅР°
 		file[Current_number_plot] << moment_of_time << "   ";
 		for (int i = 0; i < vec.size(); i++)
 		{
@@ -763,7 +763,7 @@ void GnuPlot::SetDataOnPlotColor3D(int Current_number_plot, int current_count_fr
 	string current_count_frame_str = ConvertNumToStringint(current_count_frame - 1);
 	ofstream file_anim("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
 
-	//  переаем размеры области и зачение функций в размером виде (иселючение: fun в SetDataOnPlotColor3D)!!!!!
+	//  РїРµСЂРµР°РµРј СЂР°Р·РјРµСЂС‹ РѕР±Р»Р°СЃС‚Рё Рё Р·Р°С‡РµРЅРёРµ С„СѓРЅРєС†РёР№ РІ СЂР°Р·РјРµСЂРѕРј РІРёРґРµ (РёСЃРµР»СЋС‡РµРЅРёРµ: fun РІ SetDataOnPlotColor3D)!!!!!
 	if (plane == xy)
 	{
 		/*if (Current_number_plot == 14)
@@ -804,7 +804,7 @@ void GnuPlot::SetDataOnPlotColor3D(int Current_number_plot, int current_count_fr
 		//if (Current_number_plot == 5)
 		//{
 		//	string z_str;
-		//	for (int k = 1; k <= 20; k++) // цикл по индексам оси z
+		//	for (int k = 1; k <= 20; k++) // С†РёРєР» РїРѕ РёРЅРґРµРєСЃР°Рј РѕСЃРё z
 		//	{
 		//		z_str = ConvertNumToStringint(k - 1);
 		//		ofstream file_anim1("e(xy) z(index) = " + z_str + " + " + current_count_frame_str + ".txt");
@@ -875,7 +875,7 @@ void GnuPlot::SetDataOnPlotColor2D(int Current_number_plot, int current_count_fr
 	//if (Current_number_plot == 21)
 	//{
 	//	string z_str;
-	//	for (int i = 0; i <= 50; i++) // цикл по индексам оси z
+	//	for (int i = 0; i <= 50; i++) // С†РёРєР» РїРѕ РёРЅРґРµРєСЃР°Рј РѕСЃРё z
 	//	{
 	//		z_str = ConvertNumToStringint(i - 1);
 	//		ofstream file_anim("e(xy) z(index) = " + z_str + " + " + current_count_frame_str + ".txt");
@@ -896,13 +896,13 @@ void GnuPlot::ShowDataOnPlot2D(int Current_number_plot, bool DataFromDiffFiles, 
 	if (png_)
 	{
 		fprintf(gnuplotPipe[Current_number_plot], "set terminal png\n");
-		// name_of_file - имя файла png
+		// name_of_file - РёРјСЏ С„Р°Р№Р»Р° png
 		string str_str_str = "set output \"" + name_of_file + ".png\" \n";
 		fprintf(gnuplotPipe[Current_number_plot], str_str_str.c_str());
 		str_str_str.clear();
 
 		string str_str = "plot ";
-		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - число линий на плоте, 
+		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - С‡РёСЃР»Рѕ Р»РёРЅРёР№ РЅР° РїР»РѕС‚Рµ, 
 		{
 			string tmp_num_line;
 
@@ -911,10 +911,10 @@ void GnuPlot::ShowDataOnPlot2D(int Current_number_plot, bool DataFromDiffFiles, 
 			snprintf(str, length + 1, "%i", i + 1);
 			for (int j = 0; j < length; j++)
 			{
-				tmp_num_line.push_back(str[j]); // номер столбца
+				tmp_num_line.push_back(str[j]); // РЅРѕРјРµСЂ СЃС‚РѕР»Р±С†Р°
 			}
-			// string name_line - назваие линии в легенде (например когда рисуем значение давлен от икса в различные моменты времени )
-			string name_line = list_name_line[i - 1]; // если не заработает, то ужно строки в сишные переводить .c_str(), а стринг это C++
+			// string name_line - РЅР°Р·РІР°РёРµ Р»РёРЅРёРё РІ Р»РµРіРµРЅРґРµ (РЅР°РїСЂРёРјРµСЂ РєРѕРіРґР° СЂРёСЃСѓРµРј Р·РЅР°С‡РµРЅРёРµ РґР°РІР»РµРЅ РѕС‚ РёРєСЃР° РІ СЂР°Р·Р»РёС‡РЅС‹Рµ РјРѕРјРµРЅС‚С‹ РІСЂРµРјРµРЅРё )
+			string name_line = list_name_line[i - 1]; // РµСЃР»Рё РЅРµ Р·Р°СЂР°Р±РѕС‚Р°РµС‚, С‚Рѕ СѓР¶РЅРѕ СЃС‚СЂРѕРєРё РІ СЃРёС€РЅС‹Рµ РїРµСЂРµРІРѕРґРёС‚СЊ .c_str(), Р° СЃС‚СЂРёРЅРі СЌС‚Рѕ C++
 			if (DataFromDiffFiles)
 			{
 				str_str += "'" + filename[i - 1] + "' u 1:2 w l title \"" + name_line + "\", ";
@@ -932,9 +932,9 @@ void GnuPlot::ShowDataOnPlot2D(int Current_number_plot, bool DataFromDiffFiles, 
 	}
 	else
 	{
-		// здесь будет только цикл по числу линий без первых 2-ух строчек выше от него
+		// Р·РґРµСЃСЊ Р±СѓРґРµС‚ С‚РѕР»СЊРєРѕ С†РёРєР» РїРѕ С‡РёСЃР»Сѓ Р»РёРЅРёР№ Р±РµР· РїРµСЂРІС‹С… 2-СѓС… СЃС‚СЂРѕС‡РµРє РІС‹С€Рµ РѕС‚ РЅРµРіРѕ
 		string str_str = "plot ";
-		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - число линий на плоте, 
+		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - С‡РёСЃР»Рѕ Р»РёРЅРёР№ РЅР° РїР»РѕС‚Рµ, 
 		{
 			string tmp_num_line;
 
@@ -943,9 +943,9 @@ void GnuPlot::ShowDataOnPlot2D(int Current_number_plot, bool DataFromDiffFiles, 
 			snprintf(str, length + 1, "%i", i + 1);
 			for (int j = 0; j < length; j++)
 			{
-				tmp_num_line.push_back(str[j]); // номер столбца
+				tmp_num_line.push_back(str[j]); // РЅРѕРјРµСЂ СЃС‚РѕР»Р±С†Р°
 			}
-			// string name_line - назваие линий в легенде 
+			// string name_line - РЅР°Р·РІР°РёРµ Р»РёРЅРёР№ РІ Р»РµРіРµРЅРґРµ 
 			string name_line = list_name_line[i - 1];
 			if (DataFromDiffFiles)
 			{
@@ -969,10 +969,10 @@ void GnuPlot::CreateGifOnPlot2D(int Current_number_plot, int number_of_lines, in
 	if (gif_)
 	{
 		fprintf(gnuplotPipe_Gif[Current_number_plot], "reset\n");
-		fprintf(gnuplotPipe_Gif[Current_number_plot], "set terminal gif font arial 11 animate delay 100 loop 0 size 640,480\n"); // delay 10 = 0.1 сек; loop 0 - бесконечный цикл повтора (1 - 1 раз повтор)
+		fprintf(gnuplotPipe_Gif[Current_number_plot], "set terminal gif font arial 11 animate delay 100 loop 0 size 640,480\n"); // delay 10 = 0.1 СЃРµРє; loop 0 - Р±РµСЃРєРѕРЅРµС‡РЅС‹Р№ С†РёРєР» РїРѕРІС‚РѕСЂР° (1 - 1 СЂР°Р· РїРѕРІС‚РѕСЂ)
 		string str_str_str = "set output \"" + name_of_file + ".gif\" \n";
 		fprintf(gnuplotPipe_Gif[Current_number_plot], str_str_str.c_str());
-		fprintf(gnuplotPipe_Gif[Current_number_plot], "set macros\n"); // для задания строковой переменной
+		fprintf(gnuplotPipe_Gif[Current_number_plot], "set macros\n"); // РґР»СЏ Р·Р°РґР°РЅРёСЏ СЃС‚СЂРѕРєРѕРІРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 		str_str_str.clear();
 
 		string tmp_width_line;
@@ -985,7 +985,7 @@ void GnuPlot::CreateGifOnPlot2D(int Current_number_plot, int number_of_lines, in
 		}
 		string color;
 
-		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - число линий на плоте, 
+		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - С‡РёСЃР»Рѕ Р»РёРЅРёР№ РЅР° РїР»РѕС‚Рµ, 
 		{
 			string tmp_num_line;
 			int length = snprintf(NULL, 0, "%i", i);
@@ -993,7 +993,7 @@ void GnuPlot::CreateGifOnPlot2D(int Current_number_plot, int number_of_lines, in
 			snprintf(str, length + 1, "%i", i);
 			for (int j = 0; j < length; j++)
 			{
-				tmp_num_line.push_back(str[j]); // номер линии это уже строка
+				tmp_num_line.push_back(str[j]); // РЅРѕРјРµСЂ Р»РёРЅРёРё СЌС‚Рѕ СѓР¶Рµ СЃС‚СЂРѕРєР°
 			}
 
 			if (i == 1)
@@ -1124,19 +1124,19 @@ void GnuPlot::CreateGifOnPlot2D(int Current_number_plot, int number_of_lines, in
 		//fprintf(gnuplotPipe_Gif[Current_number_plot], title.c_str());
 		//title.clear();
 		title = "set xlabel \"" + xlabel + "\"\n";
-		fprintf(gnuplotPipe_Gif[Current_number_plot], title.c_str()); // передаем текущее название осей (подправить универсалом)
+		fprintf(gnuplotPipe_Gif[Current_number_plot], title.c_str()); // РїРµСЂРµРґР°РµРј С‚РµРєСѓС‰РµРµ РЅР°Р·РІР°РЅРёРµ РѕСЃРµР№ (РїРѕРґРїСЂР°РІРёС‚СЊ СѓРЅРёРІРµСЂСЃР°Р»РѕРј)
 		title.clear();
 		title = "set ylabel \"" + ylabel + "\"\n";
 		fprintf(gnuplotPipe_Gif[Current_number_plot], title.c_str());
 		title.clear();
 
-		string str_str = "do for [i=0:" + count_frame_string + "] {set title sprintf('" + title_plot + " %%d fs', aGet(\"A\",i)); plot sprintf(aGet(\"B\",i))";//!!!!!! ПРОДОЛЖИТЬ С ЭТОГО МЕСТА
+		string str_str = "do for [i=0:" + count_frame_string + "] {set title sprintf('" + title_plot + " %%d fs', aGet(\"A\",i)); plot sprintf(aGet(\"B\",i))";//!!!!!! РџР РћР”РћР›Р–РРўР¬ РЎ Р­РўРћР“Рћ РњР•РЎРўРђ
 
-		for (int ii = 1; ii <= number_of_lines; ii++) // number_of_lines - число линий на плоте, 
+		for (int ii = 1; ii <= number_of_lines; ii++) // number_of_lines - С‡РёСЃР»Рѕ Р»РёРЅРёР№ РЅР° РїР»РѕС‚Рµ, 
 		{
 			string tmp_num_line = ConvertNumToStringint(ii);
-			// string name_line - назваие линии в легенде (например когда рисуем значение давлен от икса в различные моменты времени )
-			string name_line = list_name_line[ii - 1]; // если не заработает, то ужно строки в сишные переводить .c_str(), а стринг это C++
+			// string name_line - РЅР°Р·РІР°РёРµ Р»РёРЅРёРё РІ Р»РµРіРµРЅРґРµ (РЅР°РїСЂРёРјРµСЂ РєРѕРіРґР° СЂРёСЃСѓРµРј Р·РЅР°С‡РµРЅРёРµ РґР°РІР»РµРЅ РѕС‚ РёРєСЃР° РІ СЂР°Р·Р»РёС‡РЅС‹Рµ РјРѕРјРµРЅС‚С‹ РІСЂРµРјРµРЅРё )
+			string name_line = list_name_line[ii - 1]; // РµСЃР»Рё РЅРµ Р·Р°СЂР°Р±РѕС‚Р°РµС‚, С‚Рѕ СѓР¶РЅРѕ СЃС‚СЂРѕРєРё РІ СЃРёС€РЅС‹Рµ РїРµСЂРµРІРѕРґРёС‚СЊ .c_str(), Р° СЃС‚СЂРёРЅРі СЌС‚Рѕ C++
 			str_str += " u 1:" + tmp_num_line + " w l title \"" + name_line + "\", ''";
 		}
 
@@ -1144,7 +1144,7 @@ void GnuPlot::CreateGifOnPlot2D(int Current_number_plot, int number_of_lines, in
 		str_str.pop_back();
 		str_str.pop_back();
 		str_str.pop_back();
-		str_str += "}"; // аналог delay (значение устанавливается в секундах)
+		str_str += "}"; // Р°РЅР°Р»РѕРі delay (Р·РЅР°С‡РµРЅРёРµ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РІ СЃРµРєСѓРЅРґР°С…)
 		str_str += "\n";
 		fprintf(gnuplotPipe_Gif[Current_number_plot], str_str.c_str());
 	}
@@ -1153,11 +1153,11 @@ void GnuPlot::CreateGifOnPlot2D(int Current_number_plot, int number_of_lines, in
 		string count_frame_string = ConvertNumToStringint(count_frame - 1);
 		string str_str = "do for [i=1:" + count_frame_string + "] { plot sprintf('Data%%d.txt', i)";
 
-		for (int ii = 1; ii <= number_of_lines; ii++) // number_of_lines - число линий на плоте, 
+		for (int ii = 1; ii <= number_of_lines; ii++) // number_of_lines - С‡РёСЃР»Рѕ Р»РёРЅРёР№ РЅР° РїР»РѕС‚Рµ, 
 		{
 			string tmp_num_line = ConvertNumToStringint(ii);
-			// string name_line - назваие линии в легенде (например когда рисуем значение давлен от икса в различные моменты времени )
-			string name_line = list_name_line[ii - 1]; // если не заработает, то ужно строки в сишные переводить .c_str(), а стринг это C++
+			// string name_line - РЅР°Р·РІР°РёРµ Р»РёРЅРёРё РІ Р»РµРіРµРЅРґРµ (РЅР°РїСЂРёРјРµСЂ РєРѕРіРґР° СЂРёСЃСѓРµРј Р·РЅР°С‡РµРЅРёРµ РґР°РІР»РµРЅ РѕС‚ РёРєСЃР° РІ СЂР°Р·Р»РёС‡РЅС‹Рµ РјРѕРјРµРЅС‚С‹ РІСЂРµРјРµРЅРё )
+			string name_line = list_name_line[ii - 1]; // РµСЃР»Рё РЅРµ Р·Р°СЂР°Р±РѕС‚Р°РµС‚, С‚Рѕ СѓР¶РЅРѕ СЃС‚СЂРѕРєРё РІ СЃРёС€РЅС‹Рµ РїРµСЂРµРІРѕРґРёС‚СЊ .c_str(), Р° СЃС‚СЂРёРЅРі СЌС‚Рѕ C++
 			str_str += " u 1:" + tmp_num_line + " w l title \"" + name_line + "\", ";
 			//str_str += "'" + filename[k - 1] + "' u 1:" + tmp_num_line + " w l title \"" + name_line + "\", ";
 			//str_str += "'" + filename[Current_number_plot] + "' u 1:" + tmp_num_line + " w lp lc rgb 'red' lw 2 pt 5 title \"" + name_line + "\", ";
@@ -1165,7 +1165,7 @@ void GnuPlot::CreateGifOnPlot2D(int Current_number_plot, int number_of_lines, in
 
 		str_str.pop_back();
 		str_str.pop_back();
-		str_str += "; pause 1 }"; // аналог delay (значение устанавливается в секундах)
+		str_str += "; pause 1 }"; // Р°РЅР°Р»РѕРі delay (Р·РЅР°С‡РµРЅРёРµ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РІ СЃРµРєСѓРЅРґР°С…)
 		str_str += "\n";
 		fprintf(gnuplotPipe[Current_number_plot], str_str.c_str()/*, filename[Current_number_filename].c_str()*/);
 	}
@@ -1195,10 +1195,10 @@ void GnuPlot::ShowDataOnPlotColor(int Current_number_plot, string name_of_file, 
 void GnuPlot::CreateGifOnPlotColor(int Current_number_plot, int count_frame, vector<int> moments_fix_time_anim, string title_plot, string xlabel, string ylabel, long float right_bondary_x, long float top_bondary_y, string name_of_file)
 {
 	fprintf(gnuplotPipe_Gif[Current_number_plot], "reset\n");
-	fprintf(gnuplotPipe_Gif[Current_number_plot], "set terminal gif font arial 11 animate delay 100 loop 0 size 640,480\n"); // delay 10 = 0.1 сек; loop 0 - бесконечный цикл повтора (1 - 1 раз повтор)
+	fprintf(gnuplotPipe_Gif[Current_number_plot], "set terminal gif font arial 11 animate delay 100 loop 0 size 640,480\n"); // delay 10 = 0.1 СЃРµРє; loop 0 - Р±РµСЃРєРѕРЅРµС‡РЅС‹Р№ С†РёРєР» РїРѕРІС‚РѕСЂР° (1 - 1 СЂР°Р· РїРѕРІС‚РѕСЂ)
 	string str_str_str = "set output \"" + name_of_file + ".gif\" \n";
 	fprintf(gnuplotPipe_Gif[Current_number_plot], str_str_str.c_str());
-	fprintf(gnuplotPipe_Gif[Current_number_plot], "set macros\n"); // для задания строковой переменной
+	fprintf(gnuplotPipe_Gif[Current_number_plot], "set macros\n"); // РґР»СЏ Р·Р°РґР°РЅРёСЏ СЃС‚СЂРѕРєРѕРІРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№
 	str_str_str.clear();
 
 	/*string stroka1 = ConvertNumToStringdouble_gnuplot(0.);
@@ -1221,7 +1221,7 @@ void GnuPlot::CreateGifOnPlotColor(int Current_number_plot, int count_frame, vec
 	fprintf(gnuplotPipe_Gif[Current_number_plot], "set yrange [%lf:%lf]\n", 0., top_bondary_y);
 
 	fprintf(gnuplotPipe_Gif[Current_number_plot], "set palette defined ( 0 \"dark-violet\", 1 \"blue\", 2 \"cyan\", 3 \"green\", 4 \"yellow\", 5 \"orange\", 6 \"red\")\n");
-	if (Current_number_plot == 13 || Current_number_plot == 14)// для отрисовки зоны плавления в двух плоскостях
+	if (Current_number_plot == 13 || Current_number_plot == 14)// РґР»СЏ РѕС‚СЂРёСЃРѕРІРєРё Р·РѕРЅС‹ РїР»Р°РІР»РµРЅРёСЏ РІ РґРІСѓС… РїР»РѕСЃРєРѕСЃС‚СЏС…
 	{
 		fprintf(gnuplotPipe_Gif[Current_number_plot], "set palette defined (0 \"blue\", 1 \"red\")\n");
 	}
@@ -1309,7 +1309,7 @@ void GnuPlot::Close_all_files_and_plots(int number_of_plots_)
 
 string GnuPlot::GetGPPath()
 {
-	return "\"C:\\Program Files\\gnuplot\\bin\\gnuplot\""; // где расположена программа
+	return "\"C:\\Program Files\\gnuplot\\bin\\gnuplot\""; // РіРґРµ СЂР°СЃРїРѕР»РѕР¶РµРЅР° РїСЂРѕРіСЂР°РјРјР°
 }
 
 string GnuPlot::GetGPTerminal()
@@ -1317,7 +1317,7 @@ string GnuPlot::GetGPTerminal()
 	return "wxt";
 }
 
-size_t GnuPlot::GetTermnalWidth() //ширина экрана 
+size_t GnuPlot::GetTermnalWidth() //С€РёСЂРёРЅР° СЌРєСЂР°РЅР° 
 {
 	return 650;
 }
