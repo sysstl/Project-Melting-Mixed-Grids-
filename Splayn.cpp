@@ -152,7 +152,7 @@ void Splayn::SetInitialData(VecD X, VecD Y, VecD Z, size_t power)
 	size_t size = (power + 1) * (Z.size() - 1);
 	VecD Diagonal(size, 1.0);
 	this->_Diagonal = Diagonal;
-	double dx = this->_X[1] - this->_X[0];// равномерная сетка (если будет неравномерная сетка, то нужно одпраить в методе способ заполнения диагонали)
+	double dx = this->_X[1] - this->_X[0];// СЂР°РІРЅРѕРјРµСЂРЅР°СЏ СЃРµС‚РєР° (РµСЃР»Рё Р±СѓРґРµС‚ РЅРµСЂР°РІРЅРѕРјРµСЂРЅР°СЏ СЃРµС‚РєР°, С‚Рѕ РЅСѓР¶РЅРѕ РѕРґРїСЂР°РёС‚СЊ РІ РјРµС‚РѕРґРµ СЃРїРѕСЃРѕР± Р·Р°РїРѕР»РЅРµРЅРёСЏ РґРёР°РіРѕРЅР°Р»Рё)
 	for (size_t i = 1; i < this->_Diagonal.size(); i += 2) {
 		this->_Diagonal[i] = dx;
 	}
@@ -211,7 +211,7 @@ void Splayn::InterpolateFast1D(string fiename)
 	this->_Polinoms.clear();
 	this->_Polinoms.erase(this->_Polinoms.begin(), this->_Polinoms.end());
 
-	ifstream in(fiename); // окрываем файл для чтения
+	ifstream in(fiename); // РѕРєСЂС‹РІР°РµРј С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ
 	VecD X;
 	VecD Y;
 
@@ -383,7 +383,7 @@ void Splayn::OutPut()
 
 void Splayn::Calculation_Interpolation(string fiename)
 {
-	ifstream in(fiename); // окрываем файл для чтения
+	ifstream in(fiename); // РѕРєСЂС‹РІР°РµРј С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ
 
 	VecD X;
 	VecD Y;
@@ -440,7 +440,7 @@ void Splayn::Calculation_InterpolationFast(double*** Tei, int Nz_heat, double dz
 void Splayn::Calculation_InterpolationFast(string fiename)
 {
 	vector<Point> new_points;
-	ifstream in(fiename); // окрываем файл для чтения
+	ifstream in(fiename); // РѕРєСЂС‹РІР°РµРј С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ
 
 	VecD X;
 	VecD Y;
