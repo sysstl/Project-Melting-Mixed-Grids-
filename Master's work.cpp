@@ -1,4 +1,4 @@
-﻿// Master's work.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
+// Master's work.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
 
 #include <iostream>
@@ -451,12 +451,106 @@ void Copy_Data_From_Small_Array3D_To_Big_Array3D_Withboundary(double*** tmpe_for
 	}
 }
 
-void Transform_2D_GridFrom_AcToHeat_xy(int Nx_old, int Ny_old, int Nz_old, double& dx_old, double& dy_old, int Nx_new, int Ny_new, int Nz_new, double& dx_new, double& dy_new, double*** Initial_Data, double*** Final_Data, double** Te_old_x_new_y, Splayn spl, int coeff_big_z,
+void CreateGif2DColor(int numberplot, int time_begin, int time_end, int dt, string firstPartnamefileAnim, string titleplotframe, string xlabel, string ylabel, bool select)
+{
+	vector<int> moments_fix_time_anim;
+	vector<string> P_x, P_x_result;
+	vector<string>::iterator it_p;
+	string time_begin_str, time_end_str, numberplot_str;
+	time_begin_str = ConvertNumToString(time_begin);
+	time_end_str = ConvertNumToString(time_end);
+	numberplot_str = ConvertNumToString(numberplot);
+	for (int i = time_begin; i <= time_end; i += dt /*= 10*/) // моменты времени для отрисовки и анимации
+	{// аналог n
+		moments_fix_time_anim.push_back(i);
+		string str, number_frame_Gif;
+		number_frame_Gif = ConvertNumToString(i);
+		//str = "Data_Gif23 + " + number_frame_Gif + ".txt";
+		str = "Data_Gif"+ numberplot_str + " + "  + number_frame_Gif + ".txt";
+		//str = "e(xy) z(index) = " + numberplot_str + " + " + number_frame_Gif + ".txt";
+		P_x.push_back(str);
+		str.clear();
+	}
+	string namefileAnim = firstPartnamefileAnim + " from " + time_begin_str + " fs to " + time_end_str + " fs ";
+	if (select)
+	{
+		SelectDataForPlotColor(P_x, P_x_result, 2., 8., 2., 8.);
+		GnuPlot Animate2D2(P_x_result);
+		Animate2D2.CreateGifOnPlotColor(0, moments_fix_time_anim.size(), moments_fix_time_anim, titleplotframe, xlabel, ylabel, 6., 6., namefileAnim);
+	}
+	else
+	{
+		it_p = P_x.begin();
+		ifstream fin((*it_p));
+
+		VecD X;
+		VecD Y;
+		VecD Z;
+		VecD::iterator it_x, it_y;
+
+		if (fin.is_open())
+		{
+			double x, y, z;
+			while (fin >> x >> y >> z)
+			{
+				/*	new_points.push_back(Point{ x, y });*/
+				X.push_back(x);
+				Y.push_back(y);
+				Z.push_back(z);
+				//cout << x << "   " << y << endl;
+			}
+		}
+		fin.close();
+
+		it_x = X.end() - 1;
+		it_y = Y.end() - 1;
+
+		GnuPlot Animate2D2(P_x); // P_X - вектор названий файлов где лежат данные
+		Animate2D2.CreateGifOnPlotColor(0, moments_fix_time_anim.size(), moments_fix_time_anim, titleplotframe, xlabel, ylabel, (*it_x), (*it_y), namefileAnim);
+	}
+}
+
+void CreateGif_Y_x(int numberplot, int time_begin, int time_end, int dt, string firstPartnamefileAnim, string titleplotframe, string xlabel, string ylabel, vector <string> Legend, bool select)
+{
+	vector<int> moments_fix_time_anim;
+	vector<string> P_x, P_x_result;
+	string time_begin_str, time_end_str, numberplot_str;
+	time_begin_str = ConvertNumToString(time_begin);
+	time_end_str = ConvertNumToString(time_end);
+	numberplot_str = ConvertNumToString(numberplot);
+	for (int i = time_begin; i <= time_end; i += dt /*= 10*/) // моменты времени для отрисовки и анимации
+	{// аналог n
+		moments_fix_time_anim.push_back(i);
+		string str, number_frame_Gif;
+		number_frame_Gif = ConvertNumToString(i);
+		//str = "Data_Gif23 + " + number_frame_Gif + ".txt";
+		str = "Data_Gif" + numberplot_str + " + " + number_frame_Gif + ".txt";
+		P_x.push_back(str);
+		str.clear();
+	}
+	string namefileAnim = firstPartnamefileAnim + " from " + time_begin_str + " fs to " + time_end_str + " fs ";
+	if (select)
+	{
+		SelectDataForPlot2D(P_x, P_x_result, 0., 0.05);
+		GnuPlot Animate2D2(P_x_result);
+		Animate2D2.CreateGifOnPlot2D(0, Legend.size(), 3, moments_fix_time_anim.size(), moments_fix_time_anim, titleplotframe, xlabel, ylabel, Legend, namefileAnim, true);
+	}
+	else
+	{
+		GnuPlot Animate2D2(P_x); // P_X - вектор названий файлов где лежат данные
+		Animate2D2.CreateGifOnPlot2D(0, Legend.size(), 3, moments_fix_time_anim.size(), moments_fix_time_anim, titleplotframe, xlabel, ylabel, Legend, namefileAnim, true);
+	}
+}
+
+/*+++++++++++++*/
+void Transform_2D_GridFrom_AcToHeat_xy(int Nx_old, int Ny_old, int Nz_old, double& dx_old, double& dy_old, int Nx_new, int Ny_new, int Nz_new, double& dx_new, double& dy_new, double*** Initial_Data, double*** Final_Data,/* double** Te_old_x_new_y,*/ Splayn spl, int coeff_big_z,
 	int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat)
 {
 	// инетрпол вдоль Y
 
 	VecD X, Y;
+	vector<Splayn> vec_spl;
+	vector<Splayn>::iterator it_spl;
 
 	for (int i = 0; i < Nx_old; i++) // ac
 	{
@@ -467,11 +561,12 @@ void Transform_2D_GridFrom_AcToHeat_xy(int Nx_old, int Ny_old, int Nz_old, doubl
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (size_t k = 0; k < Ny_new; k++)
+		/*for (size_t k = 0; k < Ny_new; k++)
 		{
 			Te_old_x_new_y[i][k] = spl.GetY(k * dy_new);
-		}
+		}*/
 		X.clear();
 		X.erase(X.begin(), X.end());
 		Y.clear();
@@ -484,10 +579,12 @@ void Transform_2D_GridFrom_AcToHeat_xy(int Nx_old, int Ny_old, int Nz_old, doubl
 	for (int i = 1; i < Ny_new - 1; i++) // heat
 	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
 	{
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < Nx_old; k++) // ac
 		{
 			X.push_back(k * dx_old);
-			Y.push_back(Te_old_x_new_y[k][i]);
+			Y.push_back((*it_spl).GetY(i * dy_new));//Te_old_x_new_y[k][i]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -508,14 +605,19 @@ void Transform_2D_GridFrom_AcToHeat_xy(int Nx_old, int Ny_old, int Nz_old, doubl
 		Y.clear();
 		Y.erase(Y.begin(), Y.end());
 	}
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 }
 
-void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, double& dx_old, double& dy_old, double& dz_old, int Nx_new, int left_boundary_y_heat1, int Ny_new, int Nz_new, double& dx_new, double& dz_new, double*** Initial_Data, double*** Final_Data, double** Te_old_x_new_z, Splayn spl, int coeff_big_y, int coeff_big_x,
+/*+++++++++++++*/
+void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, double& dx_old, double& dy_old, double& dz_old, int Nx_new, int left_boundary_y_heat1, int Ny_new, int Nz_new, double& dx_new, double& dz_new, double*** Initial_Data, double*** Final_Data,/* double** Te_old_x_new_z,*/ Splayn spl, int coeff_big_y, int coeff_big_x,
 	int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat)
 {
 	// инетрпол вдоль Z
 
 	VecD X, Y;
+	vector<Splayn> vec_spl;
+	vector<Splayn>::iterator it_spl;
 
 	/*xz*/
 
@@ -528,11 +630,12 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (size_t k = 0; k < Nz_new; k++)
+		/*for (size_t k = 0; k < Nz_new; k++)
 		{
 			Te_old_x_new_z[i][k] = spl.GetY(k * dz_new);
-		}
+		}*/
 		X.clear();
 		X.erase(X.begin(), X.end());
 		Y.clear();
@@ -545,10 +648,12 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 	for (int i = 1; i < Nz_new - 1; i++) // heat
 	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
 	{
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < Nx_old; k++) // ac
 		{
 			X.push_back(k * dx_old);
-			Y.push_back(Te_old_x_new_z[k][i]);
+			Y.push_back((*it_spl).GetY(i * dz_new)); ;// Y.push_back(Te_old_x_new_z[k][i]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -570,7 +675,8 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 		Y.erase(Y.begin(), Y.end());
 	}
 
-
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 
 	for (int i = 0; i < Nx_old; i++) // ac
 	{
@@ -581,11 +687,12 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (size_t k = 0; k < Nz_new; k++)
+		/*for (size_t k = 0; k < Nz_new; k++)
 		{
 			Te_old_x_new_z[i][k] = spl.GetY(k * dz_new);
-		}
+		}*/
 		X.clear();
 		X.erase(X.begin(), X.end());
 		Y.clear();
@@ -598,10 +705,12 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 	for (int i = 1; i < Nz_new - 1; i++) // heat
 	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
 	{
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < Nx_old; k++) // ac
 		{
 			X.push_back(k * dx_old);
-			Y.push_back(Te_old_x_new_z[k][i]);
+			Y.push_back((*it_spl).GetY(i * dz_new)); // Y.push_back(Te_old_x_new_z[k][i]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -625,19 +734,8 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 
 
 	/*yz*/
@@ -651,11 +749,12 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (size_t k = 0; k < Nz_new; k++)
+		/*for (size_t k = 0; k < Nz_new; k++)
 		{
 			Te_old_x_new_z[i][k] = spl.GetY(k * dz_new);
-		}
+		}*/
 		X.clear();
 		X.erase(X.begin(), X.end());
 		Y.clear();
@@ -668,10 +767,12 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 	for (int i = 1; i < Nz_new - 1; i++) // heat
 	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
 	{
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < Ny_old; k++) // ac
 		{
 			X.push_back(k * dy_old);
-			Y.push_back(Te_old_x_new_z[k][i]);
+			Y.push_back((*it_spl).GetY(i * dz_new)); //Y.push_back(Te_old_x_new_z[k][i]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -693,7 +794,8 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 		Y.erase(Y.begin(), Y.end());
 	}
 
-
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 
 	for (int i = 0; i < Ny_old; i++) // ac
 	{
@@ -704,11 +806,12 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (size_t k = 0; k < Nz_new; k++)
+		/*for (size_t k = 0; k < Nz_new; k++)
 		{
 			Te_old_x_new_z[i][k] = spl.GetY(k * dz_new);
-		}
+		}*/
 		X.clear();
 		X.erase(X.begin(), X.end());
 		Y.clear();
@@ -721,16 +824,18 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 	for (int i = 1; i < Nz_new - 1; i++) // heat
 	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
 	{
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < Ny_old; k++) // ac
 		{
 			X.push_back(k * dy_old);
-			Y.push_back(Te_old_x_new_z[k][i]);
+			Y.push_back((*it_spl).GetY(i * dz_new)); //Y.push_back(Te_old_x_new_z[k][i]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
 		int kk = 1;
 		//cout << endl;
-		for (size_t k = left_boundary_x_heat + 1; k < right_boundary_y_heat; k++) // Final = tmpe2
+		for (size_t k = left_boundary_y_heat + 1; k < right_boundary_y_heat; k++) // Final = tmpe2
 		//for (size_t k = 0; k < Nx_new; k++)
 		{
 			//Final_Data[k][i][Nz_new - 2] = spl.GetY(k * dx_new);
@@ -745,11 +850,17 @@ void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, doubl
 		Y.clear();
 		Y.erase(Y.begin(), Y.end());
 	}
+
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 }
 
-void TransformGrid_2D_xy(int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat, double& dx_old, double& dy_old, int Nx_new, int Ny_new, int down_boundary_z_ac, double& dx_new, double& dy_new, double*** Initial_Data, double*** Final_Data, double** Te_old_y_new_x, Splayn spl)
+/*+++++++++++++*/
+void TransformGrid_2D_xy(int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat, double& dx_old, double& dy_old, int Nx_new, int Ny_new, int down_boundary_z_ac, double& dx_new, double& dy_new, double*** Initial_Data, double*** Final_Data, /*double** Te_old_y_new_x,*/ Splayn spl)
 {
 	VecD X, Y;
+	vector<Splayn> vec_spl;
+	vector<Splayn>::iterator it_spl;
 
 	// инетрпол вдоль X
 	int ii = 0;
@@ -758,17 +869,18 @@ void TransformGrid_2D_xy(int left_boundary_x_heat, int right_boundary_x_heat, in
 		int kx = 0;
 		for (size_t k = left_boundary_x_heat; k <= right_boundary_x_heat; k++)
 		{
-			X.push_back(kx * dx_old); 
+			X.push_back(kx * dx_old);
 			Y.push_back(Initial_Data[k][i][down_boundary_z_heat]);
 			kx++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
-		{
-			Te_old_y_new_x[k][ii] = spl.GetY(k * dx_new);
-		}
+		//for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+		//{
+		//	Te_old_y_new_x[k][ii] = spl.GetY(k * dx_new);
+		//}
 
 		ii++;
 		X.clear();
@@ -782,10 +894,12 @@ void TransformGrid_2D_xy(int left_boundary_x_heat, int right_boundary_x_heat, in
 
 	for (int i = 0; i < Nx_new; i++)
 	{
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < ii/*count_y_ht*/; k++)
 		{
 			X.push_back(k * dy_old);
-			Y.push_back(Te_old_y_new_x[i][k]);
+			Y.push_back((*it_spl).GetY(i * dx_new)); //Y.push_back(Te_old_y_new_x[i][k]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -798,13 +912,18 @@ void TransformGrid_2D_xy(int left_boundary_x_heat, int right_boundary_x_heat, in
 		X.erase(X.begin(), X.end());
 		Y.clear();
 		Y.erase(Y.begin(), Y.end());
-
 	}
+
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 }
 
-void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat, double& dx_old, double& dy_old, double& dz_old, int Nx_new, int Ny_new, int Nz_new, int Nx_part_ac, int Ny_part_ac, double& dx_new, double& dy_new, double& dz_new, double*** Initial_Data, double*** Final_Data, double** Te_old_z_new_x, Splayn spl)
+/*+++++++++++++*/
+void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat, double& dx_old, double& dy_old, double& dz_old, int Nx_new, int Ny_new, int Nz_new, int Nx_part_ac, int Ny_part_ac, double& dx_new, double& dy_new, double& dz_new, double*** Initial_Data, double*** Final_Data, /*double** Te_old_z_new_x,*/ Splayn spl)
 {
 	VecD X, Y;
+	vector<Splayn> vec_spl;
+	vector<Splayn>::iterator it_spl;
 
 	// инетрпол вдоль X
 	int ii = 0;
@@ -819,11 +938,12 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
-		{
-			Te_old_z_new_x[k][ii] = spl.GetY(k * dx_new);
-		}
+		//for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+		//{
+		//	Te_old_z_new_x[k][ii] = spl.GetY(k * dx_new);
+		//}
 
 		ii++;
 		X.clear();
@@ -837,12 +957,12 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 
 	for (int i = 0; i < Nx_new; i++)
 	{
-		//for (int j = 0; j < Nz_new; j++)
-
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < ii; k++)
 		{
 			X.push_back(k * dz_old);
-			Y.push_back(Te_old_z_new_x[i][k]);
+			Y.push_back((*it_spl).GetY(i * dx_new)); //Y.push_back(Te_old_z_new_x[i][k]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -858,8 +978,8 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 
 	}
 
-
-
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 
 	// инетрпол вдоль X
 	ii = 0;
@@ -874,11 +994,12 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
-		{
-			Te_old_z_new_x[k][ii] = spl.GetY(k * dx_new);
-		}
+		//for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+		//{
+		//	Te_old_z_new_x[k][ii] = spl.GetY(k * dx_new);
+		//}
 
 		ii++;
 		X.clear();
@@ -892,12 +1013,12 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 
 	for (int i = 0; i < Nx_new; i++)
 	{
-		//for (int j = 0; j < Nz_new; j++)
-
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < ii; k++)
 		{
 			X.push_back(k * dz_old);
-			Y.push_back(Te_old_z_new_x[i][k]);
+			Y.push_back((*it_spl).GetY(i * dx_new)); //Y.push_back(Te_old_z_new_x[i][k]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -913,16 +1034,8 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 
 	}
 
-
-
-
-
-
-
-
-
-
-
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 
 	// инетрпол вдоль Y
 	ii = 0;
@@ -937,11 +1050,12 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (int k = 0; k < Ny_new; k++) // Nx_new кол-во узлов в tmpe2_ac
-		{
-			Te_old_z_new_x[k][ii] = spl.GetY(k * dy_new);
-		}
+		//for (int k = 0; k < Ny_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+		//{
+		//	Te_old_z_new_x[k][ii] = spl.GetY(k * dy_new);
+		//}
 
 		ii++;
 		X.clear();
@@ -955,12 +1069,12 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 
 	for (int i = 0; i < Ny_new; i++)
 	{
-		//for (int j = 0; j < Nz_new; j++)
-
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < ii; k++)
 		{
 			X.push_back(k * dz_old);
-			Y.push_back(Te_old_z_new_x[i][k]);
+			Y.push_back((*it_spl).GetY(i * dy_new)); //Y.push_back(Te_old_z_new_x[i][k]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -976,6 +1090,8 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 
 	}
 
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 
 	// инетрпол вдоль Y
 	ii = 0;
@@ -990,11 +1106,12 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 		}
 
 		spl.InterpolateFast1D(X, Y);
+		vec_spl.push_back(spl);
 
-		for (int k = 0; k < Ny_new; k++) // Nx_new кол-во узлов в tmpe2_ac
-		{
-			Te_old_z_new_x[k][ii] = spl.GetY(k * dy_new);
-		}
+		//for (int k = 0; k < Ny_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+		//{
+		//	Te_old_z_new_x[k][ii] = spl.GetY(k * dy_new);
+		//}
 
 		ii++;
 		X.clear();
@@ -1008,12 +1125,12 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 
 	for (int i = 0; i < Ny_new; i++)
 	{
-		//for (int j = 0; j < Nz_new; j++)
-
+		it_spl = vec_spl.begin();
 		for (size_t k = 0; k < ii; k++)
 		{
 			X.push_back(k * dz_old);
-			Y.push_back(Te_old_z_new_x[i][k]);
+			Y.push_back((*it_spl).GetY(i * dy_new)); //Y.push_back(Te_old_z_new_x[i][k]);
+			it_spl++;
 		}
 
 		spl.InterpolateFast1D(X, Y);
@@ -1028,7 +1145,589 @@ void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, in
 		Y.erase(Y.begin(), Y.end());
 
 	}
+
+	vec_spl.clear();
+	vec_spl.erase(vec_spl.begin(), vec_spl.end());
 }
+
+//void Transform_2D_GridFrom_AcToHeat_xy(int Nx_old, int Ny_old, int Nz_old, double& dx_old, double& dy_old, int Nx_new, int Ny_new, int Nz_new, double& dx_new, double& dy_new, double*** Initial_Data, double*** Final_Data, double** Te_old_x_new_y, Splayn spl, int coeff_big_z,
+//	int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat)
+//{
+//	// инетрпол вдоль Y
+//
+//	VecD X, Y;
+//
+//	for (int i = 0; i < Nx_old; i++) // ac
+//	{
+//		for (size_t k = 0; k < Ny_old; k++)
+//		{
+//			X.push_back(k * dy_old);
+//			Y.push_back(Initial_Data[i][k][Nz_old - 1 - coeff_big_z]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (size_t k = 0; k < Ny_new; k++)
+//		{
+//			Te_old_x_new_y[i][k] = spl.GetY(k * dy_new);
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль X
+//	int ii = left_boundary_y_heat + 1;
+//	for (int i = 1; i < Ny_new - 1; i++) // heat
+//	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
+//	{
+//		for (size_t k = 0; k < Nx_old; k++) // ac
+//		{
+//			X.push_back(k * dx_old);
+//			Y.push_back(Te_old_x_new_y[k][i]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//		int kk = 1;
+//		//cout << endl;
+//		for (size_t k = left_boundary_x_heat + 1; k < right_boundary_x_heat; k++) // Final = tmpe2
+//		//for (size_t k = 0; k < Nx_new; k++)
+//		{
+//			//Final_Data[k][i][Nz_new - 2] = spl.GetY(k * dx_new);
+//			Final_Data[k][ii][Nz_new - 2] = spl.GetY(kk * dx_new);
+//			//cout << k << "   " << ii << "   " << Nz_new - 2 <<"   "<< spl.GetY(kk * dx_new) * 300. << endl;
+//			kk++;
+//		}
+//		//system("pause");
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//	}
+//}
+//
+//void Transform_2D_GridFrom_AcToHeat_xz(int Nx_old, int Ny_old, int Nz_old, double& dx_old, double& dy_old, double& dz_old, int Nx_new, int left_boundary_y_heat1, int Ny_new, int Nz_new, double& dx_new, double& dz_new, double*** Initial_Data, double*** Final_Data, double** Te_old_x_new_z, Splayn spl, int coeff_big_y, int coeff_big_x,
+//	int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat)
+//{
+//	// инетрпол вдоль Z
+//
+//	VecD X, Y;
+//
+//	/*xz*/
+//
+//	for (int i = 0; i < Nx_old; i++) // ac
+//	{
+//		for (size_t k = 0; k < Nz_old; k++)
+//		{
+//			X.push_back(k * dz_old);
+//			Y.push_back(Initial_Data[i][Ny_old - 1 - coeff_big_y][k]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (size_t k = 0; k < Nz_new; k++)
+//		{
+//			Te_old_x_new_z[i][k] = spl.GetY(k * dz_new);
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль X
+//	int ii = 1;
+//	for (int i = 1; i < Nz_new - 1; i++) // heat
+//	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
+//	{
+//		for (size_t k = 0; k < Nx_old; k++) // ac
+//		{
+//			X.push_back(k * dx_old);
+//			Y.push_back(Te_old_x_new_z[k][i]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//		int kk = 1;
+//		//cout << endl;
+//		for (size_t k = left_boundary_x_heat + 1; k < right_boundary_x_heat; k++) // Final = tmpe2
+//		//for (size_t k = 0; k < Nx_new; k++)
+//		{
+//			//Final_Data[k][i][Nz_new - 2] = spl.GetY(k * dx_new);
+//			Final_Data[k][Ny_new - 1][ii]/*[ii][Nz_new - 2]*/ = spl.GetY(kk * dx_new);
+//			//	cout << k << "   " << Ny_new - 1 << "   " << ii <<"   "<< spl.GetY(kk * dx_new) * 300. << endl;
+//			kk++;
+//		}
+//		//system("pause");
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//	}
+//
+//
+//
+//	for (int i = 0; i < Nx_old; i++) // ac
+//	{
+//		for (size_t k = 0; k < Nz_old; k++)
+//		{
+//			X.push_back(k * dz_old);
+//			Y.push_back(Initial_Data[i][0 + coeff_big_y][k]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (size_t k = 0; k < Nz_new; k++)
+//		{
+//			Te_old_x_new_z[i][k] = spl.GetY(k * dz_new);
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль X
+//	ii = 1;
+//	for (int i = 1; i < Nz_new - 1; i++) // heat
+//	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
+//	{
+//		for (size_t k = 0; k < Nx_old; k++) // ac
+//		{
+//			X.push_back(k * dx_old);
+//			Y.push_back(Te_old_x_new_z[k][i]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//		int kk = 1;
+//		//cout << endl;
+//		for (size_t k = left_boundary_x_heat + 1; k < right_boundary_x_heat; k++) // Final = tmpe2
+//		//for (size_t k = 0; k < Nx_new; k++)
+//		{
+//			//Final_Data[k][i][Nz_new - 2] = spl.GetY(k * dx_new);
+//			Final_Data[k][left_boundary_y_heat1 + 1][ii]/*[ii][Nz_new - 2]*/ = spl.GetY(kk * dx_new);
+//			//cout << k << "   " << left_boundary_y_heat1 + 1 << "   " << ii << "   " << spl.GetY(kk * dx_new) * 300. << endl;
+//			kk++;
+//		}
+//		//system("pause");
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//	}
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//	/*yz*/
+//
+//	for (int i = 0; i < Ny_old; i++) // ac
+//	{
+//		for (size_t k = 0; k < Nz_old; k++)
+//		{
+//			X.push_back(k * dz_old);
+//			Y.push_back(Initial_Data[Nx_old - 1 - coeff_big_x][i][k]/*[i][Ny_old - 1 - coeff_big_y][k]*/);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (size_t k = 0; k < Nz_new; k++)
+//		{
+//			Te_old_x_new_z[i][k] = spl.GetY(k * dz_new);
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль X
+//	ii = 1;
+//	for (int i = 1; i < Nz_new - 1; i++) // heat
+//	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
+//	{
+//		for (size_t k = 0; k < Ny_old; k++) // ac
+//		{
+//			X.push_back(k * dy_old);
+//			Y.push_back(Te_old_x_new_z[k][i]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//		int kk = 1;
+//		//cout << endl;
+//		for (size_t k = left_boundary_y_heat + 1; k < right_boundary_y_heat; k++) // Final = tmpe2
+//		//for (size_t k = 0; k < Nx_new; k++)
+//		{
+//			//Final_Data[k][i][Nz_new - 2] = spl.GetY(k * dx_new);
+//			Final_Data[Nx_new - 1][k]/*[k][Ny_new - 1]*/[ii]/*[ii][Nz_new - 2]*/ = spl.GetY(kk * dx_new);
+//			//cout << Nx_new - 1 << "   " << k << "   " << ii << "   " << spl.GetY(kk * dx_new) * 300. << endl;
+//			kk++;
+//		}
+//		//system("pause");
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//	}
+//
+//
+//
+//	for (int i = 0; i < Ny_old; i++) // ac
+//	{
+//		for (size_t k = 0; k < Nz_old; k++)
+//		{
+//			X.push_back(k * dz_old);
+//			Y.push_back(Initial_Data[0 + coeff_big_x][i][k]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (size_t k = 0; k < Nz_new; k++)
+//		{
+//			Te_old_x_new_z[i][k] = spl.GetY(k * dz_new);
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль X
+//	ii = 1;
+//	for (int i = 1; i < Nz_new - 1; i++) // heat
+//	//for (int i = left_boundary_y_heat + 1; i < Ny_new; i++) // heat
+//	{
+//		for (size_t k = 0; k < Ny_old; k++) // ac
+//		{
+//			X.push_back(k * dy_old);
+//			Y.push_back(Te_old_x_new_z[k][i]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//		int kk = 1;
+//		//cout << endl;
+//		for (size_t k = left_boundary_x_heat + 1; k < right_boundary_y_heat; k++) // Final = tmpe2
+//		//for (size_t k = 0; k < Nx_new; k++)
+//		{
+//			//Final_Data[k][i][Nz_new - 2] = spl.GetY(k * dx_new);
+//			Final_Data[left_boundary_x_heat + 1][k][ii]/*[ii][Nz_new - 2]*/ = spl.GetY(kk * dx_new);
+//			//cout << left_boundary_x_heat + 1 << "   " << k << "   " << ii << "   " << spl.GetY(kk * dx_new) * 300. << endl;
+//			kk++;
+//		}
+//		//system("pause");
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//	}
+//}
+//
+//void TransformGrid_2D_xy(int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat, double& dx_old, double& dy_old, int Nx_new, int Ny_new, int down_boundary_z_ac, double& dx_new, double& dy_new, double*** Initial_Data, double*** Final_Data, double** Te_old_y_new_x, Splayn spl)
+//{
+//	VecD X, Y;
+//
+//	// инетрпол вдоль X
+//	int ii = 0;
+//	for (int i = left_boundary_y_heat; i <= right_boundary_y_heat; i++)  // Init_data = tmpe2
+//	{
+//		int kx = 0;
+//		for (size_t k = left_boundary_x_heat; k <= right_boundary_x_heat; k++)
+//		{
+//			X.push_back(kx * dx_old);
+//			Y.push_back(Initial_Data[k][i][down_boundary_z_heat]);
+//			kx++;
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+//		{
+//			Te_old_y_new_x[k][ii] = spl.GetY(k * dx_new);
+//		}
+//
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль Y
+//
+//	for (int i = 0; i < Nx_new; i++)
+//	{
+//		for (size_t k = 0; k < ii/*count_y_ht*/; k++)
+//		{
+//			X.push_back(k * dy_old);
+//			Y.push_back(Te_old_y_new_x[i][k]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Ny_new; k++) // tmpe2_ac = final
+//		{
+//			Final_Data[i][k][down_boundary_z_ac - 1] = spl.GetY(k * dy_new); // ВСТАВИЛИ ТУДА КУДА НАДО
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//}
+//
+//void TransformGrid_2D_xz(int left_boundary_x_heat, int right_boundary_x_heat, int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat, double& dx_old, double& dy_old, double& dz_old, int Nx_new, int Ny_new, int Nz_new, int Nx_part_ac, int Ny_part_ac, double& dx_new, double& dy_new, double& dz_new, double*** Initial_Data, double*** Final_Data, double** Te_old_z_new_x, Splayn spl)
+//{
+//	VecD X, Y;
+//
+//	// инетрпол вдоль X
+//	int ii = 0;
+//	for (int i = 0; i <= down_boundary_z_heat; i++)  // Init_data = tmpe2
+//	{
+//		int kx = 0;
+//		for (size_t k = left_boundary_x_heat; k <= right_boundary_x_heat; k++)
+//		{
+//			X.push_back(kx * dx_old);
+//			Y.push_back(Initial_Data[k][right_boundary_y_heat][i]);
+//			kx++;
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+//		{
+//			Te_old_z_new_x[k][ii] = spl.GetY(k * dx_new);
+//		}
+//
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль Z
+//
+//	for (int i = 0; i < Nx_new; i++)
+//	{
+//		//for (int j = 0; j < Nz_new; j++)
+//
+//		for (size_t k = 0; k < ii; k++)
+//		{
+//			X.push_back(k * dz_old);
+//			Y.push_back(Te_old_z_new_x[i][k]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Nz_new; k++) // tmpe2_ac = final
+//		{
+//			Final_Data[i][Ny_part_ac - 1][k]/*[k][down_boundary_z_ac - 1] */ = spl.GetY(k * dz_new); // ВСТАВИЛИ ТУДА КУДА НАДО
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//
+//
+//
+//	// инетрпол вдоль X
+//	ii = 0;
+//	for (int i = 0; i <= down_boundary_z_heat; i++)  // Init_data = tmpe2
+//	{
+//		int kx = 0;
+//		for (size_t k = left_boundary_x_heat; k <= right_boundary_x_heat; k++)
+//		{
+//			X.push_back(kx * dx_old);
+//			Y.push_back(Initial_Data[k][left_boundary_y_heat][i]);
+//			kx++;
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Nx_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+//		{
+//			Te_old_z_new_x[k][ii] = spl.GetY(k * dx_new);
+//		}
+//
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль Z
+//
+//	for (int i = 0; i < Nx_new; i++)
+//	{
+//		//for (int j = 0; j < Nz_new; j++)
+//
+//		for (size_t k = 0; k < ii; k++)
+//		{
+//			X.push_back(k * dz_old);
+//			Y.push_back(Te_old_z_new_x[i][k]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Nz_new; k++) // tmpe2_ac = final
+//		{
+//			Final_Data[i][0][k]/*[k][down_boundary_z_ac - 1] */ = spl.GetY(k * dz_new); // ВСТАВИЛИ ТУДА КУДА НАДО
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//	// инетрпол вдоль Y
+//	ii = 0;
+//	for (int i = 0; i <= down_boundary_z_heat; i++)  // Init_data = tmpe2
+//	{
+//		int kx = 0;
+//		for (size_t k = left_boundary_y_heat; k <= right_boundary_y_heat; k++)
+//		{
+//			X.push_back(kx * dy_old);
+//			Y.push_back(Initial_Data[right_boundary_x_heat][k][i]);
+//			kx++;
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Ny_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+//		{
+//			Te_old_z_new_x[k][ii] = spl.GetY(k * dy_new);
+//		}
+//
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль Z
+//
+//	for (int i = 0; i < Ny_new; i++)
+//	{
+//		//for (int j = 0; j < Nz_new; j++)
+//
+//		for (size_t k = 0; k < ii; k++)
+//		{
+//			X.push_back(k * dz_old);
+//			Y.push_back(Te_old_z_new_x[i][k]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Nz_new; k++) // tmpe2_ac = final
+//		{
+//			Final_Data[Nx_part_ac - 1][i][k]/*[k][down_boundary_z_ac - 1] */ = spl.GetY(k * dz_new); // ВСТАВИЛИ ТУДА КУДА НАДО
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//
+//	// инетрпол вдоль Y
+//	ii = 0;
+//	for (int i = 0; i <= down_boundary_z_heat; i++)  // Init_data = tmpe2
+//	{
+//		int kx = 0;
+//		for (size_t k = left_boundary_y_heat; k <= right_boundary_y_heat; k++)
+//		{
+//			X.push_back(kx * dy_old);
+//			Y.push_back(Initial_Data[left_boundary_x_heat][k][i]);
+//			kx++;
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Ny_new; k++) // Nx_new кол-во узлов в tmpe2_ac
+//		{
+//			Te_old_z_new_x[k][ii] = spl.GetY(k * dy_new);
+//		}
+//
+//		ii++;
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//
+//	// инетрпол вдоль Z
+//
+//	for (int i = 0; i < Ny_new; i++)
+//	{
+//		//for (int j = 0; j < Nz_new; j++)
+//
+//		for (size_t k = 0; k < ii; k++)
+//		{
+//			X.push_back(k * dz_old);
+//			Y.push_back(Te_old_z_new_x[i][k]);
+//		}
+//
+//		spl.InterpolateFast1D(X, Y);
+//
+//		for (int k = 0; k < Nz_new; k++) // tmpe2_ac = final
+//		{
+//			Final_Data[0][i][k]/*[k][down_boundary_z_ac - 1] */ = spl.GetY(k * dz_new); // ВСТАВИЛИ ТУДА КУДА НАДО
+//		}
+//		X.clear();
+//		X.erase(X.begin(), X.end());
+//		Y.clear();
+//		Y.erase(Y.begin(), Y.end());
+//
+//	}
+//}
 
 void TransformGridFrom_AcToHeat(int Nx_old, int Ny_old, int Nz_old, double& dx_old, double& dy_old, double& dz_old, int Nx_new, int Ny_new, int Nz_new, double& dx_new, double& dy_new, double& dz_new, double*** Initial_Data, double*** Final_Data, double*** Te_old_xy_new_z, double*** Te_old_y_new_xz, Splayn spl)
 {
@@ -3727,16 +4426,14 @@ void Calculation10(double*** a1x,/* double*** a2x*/ double*** b1x, double*** b2x
 
 void Calculation2(double*** a1x, double*** a1y, double*** a1z, double*** a2x, double*** a2y, double*** a2z, double*** b2x, double*** b2y, double*** b2z, double*** V2, double*** V1, double*** V00, double*** e2,
 	double*** tmpe1, double*** tmpi1, double*** a1x_ac, double*** a2x_ac, double*** a1y_ac, double*** a2y_ac, double*** a1z_ac, double*** a2z_ac, double*** b2x_ac, double*** b2y_ac,double*** b2z_ac,
-	double*** V2_ac, double*** V1_ac, double*** V00_ac, double*** tmpe_ac1_new, double*** tmpi_ac1_new, double*** e2_ac_new, double& dx, double& dy, double& dz, int Nx_part_ht, int  Ny_part_ht, double& dx_ac,
+	double*** V2_ac, double*** V1_ac, double*** V00_ac, double*** tmpe_ac1_new, double*** tmpi_ac1_new, double*** e2_ac_new, double*** e1_ac_new, double& dx, double& dy, double& dz, int Nx_part_ht, int  Ny_part_ht, double& dx_ac,
 	double& dy_ac, double& dz_ac, double& dt, double& CC0,
 	int& Nx, int& Ny, int& Nz, int left_boundary_x_heat, int right_boundary_x_heat,
 	int left_boundary_y_heat, int right_boundary_y_heat, int down_boundary_z_heat, int Nx_ac, int Ny_ac, int Nz_ac, double& V0, P0V & p0v, /*double*** tmpe_for_transform_new,*/
-	/*double*** Tei_old_xy_new_z, double*** Tei_old_y_new_xz, double*** Te_acoustic, double*** Tei_old_xy_new_z_for_total_ac, double*** Tei_old_y_new_xz_for_total_ac,*/ double** Te_old_x_new_y, double** Te_old_y_new_x, double** Te_old_x_new_z, double** Te_old_z_new_x, int coeff_big_x, int coeff_big_y, int coeff_big_z,
+	/*double*** Tei_old_xy_new_z, double*** Tei_old_y_new_xz, double*** Te_acoustic, double*** Tei_old_xy_new_z_for_total_ac, double*** Tei_old_y_new_xz_for_total_ac,*/ /*double** Te_old_x_new_y, double** Te_old_y_new_x, double** Te_old_x_new_z, double** Te_old_z_new_x,*/ int coeff_big_x, int coeff_big_y, int coeff_big_z,
 	vector<Melting> & Melt_metal, Metal mt, Parametrs & param,
 	Splayn & spl_C_e_on_T, Splayn & spl_Te, Splayn & spl_Ti, Splayn & spl_e, /*double*** Tei_old_xy_new_z, double*** Tei_old_y_new_xz,*/ int& current_count_frame,
-	vector<Point3D> & points_rupture_ac, vector<Point3D> & points_rupture_heat, vector<Interval> & new_interv_z, Splayn spl_C_l_on_T /*int Nx_acoustic_total, int Ny_acoustic_total,
-	int Nz_acoustic_total,*/ /*int left_boundary_x_ac, int right_boundary_x_ac, int left_boundary_y_ac, int  right_boundary_y_ac, int down_boundary_z_ac*/)
-
+	vector<Point3D> & points_rupture_ac, vector<Point3D> & points_rupture_heat, vector<Interval> & new_interv_z, Splayn spl_C_l_on_T)
 {
 	// Calculation of 
  // Calculatuion 2
@@ -3839,47 +4536,47 @@ void Calculation2(double*** a1x, double*** a1y, double*** a1z, double*** a2x, do
 	
 	/* сшивка границ координат (1-й этап) (2-я версия)*/ 
 	/*a2x*/
-	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, a2x_ac, a2x, Te_old_x_new_y, spl_Te, coeff_big_z,
+	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, a2x_ac, a2x, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, a2x_ac, a2x, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, a2x_ac, a2x, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
 	// from ht to ac /* сшивка границ координат (2-й этап) */
 	TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
-		dx_ac, dy_ac, a2x, a2x_ac, Te_old_y_new_x, spl_Te);
+		dx_ac, dy_ac, a2x, a2x_ac, /*Te_old_y_new_x,*/ spl_Te);
 
-	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, a2x, a2x_ac, Te_old_z_new_x, spl_Te);
+	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, a2x, a2x_ac, /*Te_old_z_new_x,*/ spl_Te);
 
 
 	/*a2y*/
 	/* сшивка границ координат (1-й этап) (2-я версия)*/
-	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, a2y_ac, a2y, Te_old_x_new_y, spl_Te, coeff_big_z,
+	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, a2y_ac, a2y, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, a2y_ac, a2y, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, a2y_ac, a2y, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
 	// from ht to ac /* сшивка границ координат (2-й этап) */
 	TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
-		dx_ac, dy_ac, a2y, a2y_ac, Te_old_y_new_x, spl_Te);
+		dx_ac, dy_ac, a2y, a2y_ac, /*Te_old_y_new_x,*/ spl_Te);
 
-	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, a2y, a2y_ac, Te_old_z_new_x, spl_Te);
+	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, a2y, a2y_ac, /*Te_old_z_new_x,*/ spl_Te);
 
 
 	/*a2z*/
 	/* сшивка границ координат (1-й этап) (2-я версия)*/
-	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, a2z_ac, a2z, Te_old_x_new_y, spl_Te, coeff_big_z,
+	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, a2z_ac, a2z, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, a2z_ac, a2z, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, a2z_ac, a2z, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
 	// from ht to ac /* сшивка границ координат (2-й этап) */
 	TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
-		dx_ac, dy_ac, a2z, a2z_ac, Te_old_y_new_x, spl_Te);
+		dx_ac, dy_ac, a2z, a2z_ac, /*Te_old_y_new_x,*/ spl_Te);
 
-	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, a2z, a2z_ac, Te_old_z_new_x, spl_Te);
+	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, a2z, a2z_ac, /*Te_old_z_new_x,*/ spl_Te);
 
 	//сшивка координат (внутренняя граница) (старая версия)
 	/*TransformGridFrom_AcToHeat(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac,
@@ -4016,45 +4713,48 @@ void Calculation2(double*** a1x, double*** a1y, double*** a1z, double*** a2x, do
 	Sleep(1000);
 	cout << " STOP STOP STOP STOP STOP V2" << endl;
 	system("pause");*/
+	/**/
 
-	/*V2 (1-й этап) */
-	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, V2_ac, V2, Te_old_x_new_y, spl_Te, coeff_big_z,
+	//V2 (1-й этап)
+	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, V2_ac, V2, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, V2_ac, V2, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, V2_ac, V2, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
 	// from ht to ac /* сшивка границ объема (2-й этап) */
 	TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
-		dx_ac, dy_ac, V2, V2_ac, Te_old_y_new_x, spl_Te);
+		dx_ac, dy_ac, V2, V2_ac, /*Te_old_y_new_x,*/ spl_Te);
 
-	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, V2, V2_ac, Te_old_z_new_x, spl_Te);
+	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, V2, V2_ac, /*Te_old_z_new_x,*/ spl_Te);
 
 	/*V1 (1-й этап) */
-	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, V1_ac, V1, Te_old_x_new_y, spl_Te, coeff_big_z,
-		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
+	/*//Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, V1_ac, V1, Te_old_x_new_y, spl_Te, coeff_big_z,
+	//	left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, V1_ac, V1, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
-		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
+	//Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, V1_ac, V1, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+	//	left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
-	// from ht to ac /* сшивка границ объема (2-й этап) */
-	TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
-		dx_ac, dy_ac, V1, V1_ac, Te_old_y_new_x, spl_Te);
+	//// from ht to ac /* сшивка границ объема (2-й этап) //
+	//TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
+	//	dx_ac, dy_ac, V1, V1_ac, Te_old_y_new_x, spl_Te);
 
-	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, V1, V1_ac, Te_old_z_new_x, spl_Te);
+	//TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, V1, V1_ac, Te_old_z_new_x, spl_Te);
 
-	/*V00 (1-й этап) */
-	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, V00_ac, V00, Te_old_x_new_y, spl_Te, coeff_big_z,
-		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
+	///*V00 (1-й этап) //
+	//Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, V00_ac, V00, Te_old_x_new_y, spl_Te, coeff_big_z,
+	//	left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, V00_ac, V00, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
-		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
+	//Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, V00_ac, V00, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+	//	left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
-	// from ht to ac /* сшивка границ объема (2-й этап) */
-	TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
-		dx_ac, dy_ac, V00, V00_ac, Te_old_y_new_x, spl_Te);
+	//// from ht to ac /* сшивка границ объема (2-й этап) //
 
-	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, V00, V00_ac, Te_old_z_new_x, spl_Te);
+	//TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
+	//	dx_ac, dy_ac, V00, V00_ac, Te_old_y_new_x, spl_Te);
+
+	//TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, V00, V00_ac, Te_old_z_new_x, spl_Te);
+	*/
 
 	// сшивка объема V2 (внутр границы для крупной сетки) (старая версия)
 	/*TransformGridFrom_AcToHeat(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac,
@@ -4215,7 +4915,14 @@ void Calculation2(double*** a1x, double*** a1y, double*** a1z, double*** a2x, do
 				{
 					if ((*it_ac).index_x == i && (*it_ac).index_y == j && (*it_ac).index_z == k)
 					{
-						e2_ac_new[(*it_ac).index_x][(*it_ac).index_y][(*it_ac).index_z] = 1e-16;
+						if (e1_ac_new[(*it_ac).index_x][(*it_ac).index_y][(*it_ac).index_z] == 1e-16)
+						{
+							e2_ac_new[(*it_ac).index_x][(*it_ac).index_y][(*it_ac).index_z] = e1_ac_new[(*it_ac).index_x][(*it_ac).index_y][(*it_ac).index_z];
+						}
+						else
+						{
+							e2_ac_new[(*it_ac).index_x][(*it_ac).index_y][(*it_ac).index_z] = 0.;// 1e-16;
+						}
 						it_ac++;
 					}
 					else
@@ -4245,8 +4952,7 @@ void Calculation2(double*** a1x, double*** a1y, double*** a1z, double*** a2x, do
 									(Te_acoustic[i][j][k] - 1.);// */
 
 							if (tmpi_ac1_new[i][j][k] == 1e-16 || tmpe_ac1_new[i][j][k] == 1e-16)
-							{
-							}
+							{}
 							else
 							{
 								e2_ac_new[i][j][k] = (1. - V2_ac[i][j][k]) +
@@ -4259,8 +4965,7 @@ void Calculation2(double*** a1x, double*** a1y, double*** a1z, double*** a2x, do
 						if ((tmpi_ac1_new[i][j][k] * param.T00) > (Melt_metal[mt].T_melting + delta))
 						{
 							if (tmpi_ac1_new[i][j][k] == 1e-16 || tmpe_ac1_new[i][j][k] == 1e-16)
-							{
-							}
+							{}
 							else
 							{
 								e2_ac_new[i][j][k] = (1. - V2_ac[i][j][k]) +
@@ -4322,17 +5027,17 @@ void Calculation2(double*** a1x, double*** a1y, double*** a1z, double*** a2x, do
 
 
 	/*e2 (1-й этап) */
-	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, e2_ac_new, e2, Te_old_x_new_y, spl_Te, coeff_big_z,
+	Transform_2D_GridFrom_AcToHeat_xy(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx, dy, e2_ac_new, e2, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, e2_ac_new, e2, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+	Transform_2D_GridFrom_AcToHeat_xz(Nx_ac, Ny_ac, Nz_ac, dx_ac, dy_ac, dz_ac, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx, dz, e2_ac_new, e2, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 		left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
 	// from ht to ac /* сшивка границ давления (2-й этап) */
 	TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, Nx_ac, Ny_ac, Nz_ac,
-		dx_ac, dy_ac, e2, e2_ac_new, Te_old_y_new_x, spl_Te);
+		dx_ac, dy_ac, e2, e2_ac_new, /*Te_old_y_new_x,*/ spl_Te);
 
-	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, e2, e2_ac_new, Te_old_z_new_x, spl_Te);
+	TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx, dy, dz, Nx_ac, Ny_ac, Nz_ac, Nx_ac, Ny_ac, dx_ac, dy_ac, dz_ac, e2, e2_ac_new, /*Te_old_z_new_x,*/ spl_Te);
 
 
 	//// сшивка давления (внутренн границы) (старая версия)
@@ -4386,17 +5091,18 @@ void Calculation2(double*** a1x, double*** a1y, double*** a1z, double*** a2x, do
 			{
 				if ((e2_ac_new[i][j][k] * p0v.p0v_s) <= -1400)
 				{
-					//fout_ac << e2_ac_new[i][j][k] * p0v.p0v_s << endl;
-
-					e2_ac_new[i][j][k] = 1e-16;
+					e2_ac_new[i][j][k] = 0.;// индикаор того, что в точке уже нет вещества// 1e-16;
+					e2_ac_new[i][j][k + 1] = 1e-16; // устанавливаем ГУ - свободная граница P = 0
 					Point3D tmp1(i, j, k);
+					Point3D tmp2(i, j, k + 1);
 					points_rupture_ac.push_back(tmp1);
-					/*for (int m = 0; m < k; m++)
+					points_rupture_ac.push_back(tmp2);
+					for (int m = 0; m < k; m++)
 					{
-						e2_ac_new[i][j][m] = 1e-16;
+						e2_ac_new[i][j][m] = 0.;
 						Point3D tmp(i, j, m);
 						points_rupture_ac.push_back(tmp);
-					}*/
+					}
 					// старый варинат
 					//e2_ac_new[i][j][k] = 1e-16;
 					//Point3D tmp(i, j, k);
@@ -4593,6 +5299,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 	int coeff_big_z = down_boundary_z_acoustic / down_boundary_z_heat;
 	int coeff_big_y = Ny_part_ac / Ny_part_ht;
 	int coeff_big_x = coeff_big_y;
+	cout << " coeff_big_z = " << coeff_big_z << " coeff_big_y = " << coeff_big_y << endl;
 
 	/////////////////////////////
 
@@ -4620,19 +5327,19 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 		***b2x_ac_new, ***b1y_ac_new, ***b2y_ac_new, ***b1z_ac_new, ***b2z_ac_new, ***e2_ac_new, ***e1_ac_new, ***Tei_old_xy_new_z, ***Tei_old_y_new_xz;
 	double*** tmpe_ac0_new, ***tmpe_ac1_new, ***tmpe_ac2_new, ***tmpi_ac0_new, ***tmpi_ac1_new, ***tmpi_ac2_new;
 	double*** tmpe_for_transform_new, *** Array3D_for_Plot; // массив куда перебрасываем часть поля (например темепраутры) и эти данные пеерводим из крупной в мелкую сетку
-	double** Te_old_x_new_y, ** Te_old_x_new_z;
+	//double** Te_old_x_new_y, ** Te_old_x_new_z;
 
-	Te_old_x_new_y = new double* [Nx_part_ac + 1]; 
-	for (int j = 0; j < Nx_part_ac + 1; j++)
-	{
-		Te_old_x_new_y[j] = new double[Ny_part_ht + 1];
-	}
+	//Te_old_x_new_y = new double* [Nx_part_ac + 1]; 
+	//for (int j = 0; j < Nx_part_ac + 1; j++)
+	//{
+	//	Te_old_x_new_y[j] = new double[Ny_part_ht + 1];
+	//}
 
-	Te_old_x_new_z = new double* [Nx_part_ac + 1];
-	for (int j = 0; j < Nx_part_ac + 1; j++)
-	{
-		Te_old_x_new_z[j] = new double[down_boundary_z_heat + 1];
-	}
+	//Te_old_x_new_z = new double* [Nx_part_ac + 1];
+	//for (int j = 0; j < Nx_part_ac + 1; j++)
+	//{
+	//	Te_old_x_new_z[j] = new double[down_boundary_z_heat + 1];
+	//}
 
 	tmpe_for_transform_new = new double** [Nx_part_ht + 1]; //Nx_part_ht + 2
 
@@ -4884,7 +5591,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 
 	tt = n * dt * t0 * 1e+15; // vremja v fs
 
-	int number_plots = 28; //24
+	int number_plots = 29; //24
 	int count_of_lines = 9;
 	int npxzt = 1;
 	int Ti_P_x_profile = 1;
@@ -4958,6 +5665,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 	plt.SetParametrsOnPlotColor(25, "a2x", "z,mkm", "x,mkm", (1e+4* dz_acoustic* (Nz_acoustic_show* part_depth) / kabs), (1e+4* r0* dx_acoustic* Nx_acoustic_show));
 	plt.SetParametrsOnPlotColor(26, "a2z", "y,mkm", "x,mkm", (1e+4* r0* dy_acoustic* Ny_acoustic_show), (1e+4* r0* dx_acoustic* Nx_acoustic_show));
 	plt.SetParametrsOnPlotColor(27, "a2x", "y,mkm", "x,mkm", (1e+4* r0* dy_acoustic* Ny_acoustic_show), (1e+4* r0* dx_acoustic* Nx_acoustic_show));
+	plt.SetParametrs2D(28, 2, 3, "a2z", "z,mkm", "a2z, mkm");
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -4985,13 +5693,14 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 	vector<string> TeTiTfs = { "Te","Ti" };
 	vector<string> Pfs = { "P" };
 	vector<string> TiTfs = { "Ti" };
+	vector<string> a2z_e_l = { "Lagrange", "Euler" };
 	vector<string> Legenda_melting_tmp;
 	vector<string> Legenda;
 	vector<string> Legenda_Ti_x;
 	vector<string> Legenda_P_x;
 	vector<string> FilesForWritting;  // имена файлов куда запишутся поля темепратур и т.д
 	vector<string> FilesForReading;
-	vector<int> for_close_and_open = { 0, 2, 3, 4, 5, 6, 7, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 , 24, 25, 26, 27 /*, 28, 29, 30, 31, 32, 33, 34 */ };
+	vector<int> for_close_and_open = { 0, 2, 3, 4, 5, 6, 7, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 , 24, 25, 26, 27, 28 /*, 29, 30, 31, 32, 33, 34 */ };
 	vector<int> for_close_and_open_29 = { 29 };
 	vector<int> for_close_and_open_ac = { 0, 1, 2 };
 	string namefile;
@@ -5105,7 +5814,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 				a1x_ac_new[(*it).index_x][(*it).index_y][(*it).index_z] = 1e-16;
 				a1y_ac_new[(*it).index_x][(*it).index_y][(*it).index_z] = 1e-16;
 				a1z_ac_new[(*it).index_x][(*it).index_y][(*it).index_z] = 1e-16;
-				e1_ac_new[(*it).index_x][(*it).index_y][(*it).index_z] = 1e-16;
+				//e1_ac_new[(*it).index_x][(*it).index_y][(*it).index_z] = 1e-16;
 			}
 		}
 
@@ -5174,10 +5883,10 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 
 		/* сшивка границ tmpe (1-й этап) (2-я версия)*/
 
-		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, tmpe_ac2_new, tmpe2, Te_old_x_new_y, spl_Te, coeff_big_z,
+		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, tmpe_ac2_new, tmpe2, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, tmpe_ac2_new, tmpe2, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, tmpe_ac2_new, tmpe2,/* Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 		fun21(Nx_heat, Ny_heat, Nz_heat, tmpe2, tmpi1, tmpi2, dz_heat, param, mt);
 
@@ -5223,10 +5932,10 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 
 		// from ht to ac /* сшивка границ tmpe (2-й этап) */
 		TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1,
-			dx_acoustic, dy_acoustic, tmpe2, tmpe_ac2_new, Te_old_x_new_y, spl_Te);
+			dx_acoustic, dy_acoustic, tmpe2, tmpe_ac2_new, /*Te_old_x_new_y,*/ spl_Te);
 
 		TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, dz_heat, Nx_part_ac + 1, Ny_part_ac + 1, 
-			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, tmpe2, tmpe_ac2_new, Te_old_x_new_z, spl_Te);
+			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, tmpe2, tmpe_ac2_new, /*Te_old_x_new_z,*/ spl_Te);
 		fun21_for_ac(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, tmpe_ac2_new, tmpi_ac1_new, tmpi_ac2_new, dz_acoustic, param, mt, points_rupture_ac);
 
 		//plt_TE_ac.SetParametrsOnPlotColor(7, "Te", "x,mkm", "y,mkm", (1e+4* 1e-2* dx_acoustic* Nx_part_ac), (1e+4* 1e-2* dy_acoustic* Ny_part_ac));
@@ -5267,19 +5976,19 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 		//system("pause");
 
 		/* сшивка границ tmpi (1-й этап) (2-я версия)*/
-		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, tmpi_ac2_new, tmpi2, Te_old_x_new_y, spl_Te, coeff_big_z,
+		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, tmpi_ac2_new, tmpi2, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, tmpi_ac2_new, tmpi2, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, tmpi_ac2_new, tmpi2, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 		fun21(Nx_heat, Ny_heat, Nz_heat, tmpe2, tmpi1, tmpi2, dz_heat, param, mt);
 
 		// from ht to ac /* сшивка границ tmpi (2-й этап) */
 		TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1,
-			dx_acoustic, dy_acoustic, tmpi2, tmpi_ac2_new, Te_old_x_new_y, spl_Te);
+			dx_acoustic, dy_acoustic, tmpi2, tmpi_ac2_new, /*Te_old_x_new_y,*/ spl_Te);
 
 		TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, dz_heat, Nx_part_ac + 1, Ny_part_ac + 1,
-			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, tmpi2, tmpi_ac2_new, Te_old_x_new_z, spl_Te);
+			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, tmpi2, tmpi_ac2_new, /*Te_old_x_new_z,*/ spl_Te);
 		fun21_for_ac(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, tmpe_ac2_new, tmpi_ac1_new, tmpi_ac2_new, dz_acoustic, param, mt, points_rupture_ac);
 
 
@@ -5406,46 +6115,46 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 
 
 			/* сшивка границ скорости (1-й этап) (2-я версия)*/
-		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, b2x_ac_new, b2x, Te_old_x_new_y, spl_Te, coeff_big_z,
+		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, b2x_ac_new, b2x, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, b2x_ac_new, b2x, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, b2x_ac_new, b2x, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
 		// from ht to ac /* сшивка границ скорости (2-й этап) */
 		TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1,
-			dx_acoustic, dy_acoustic, b2x, b2x_ac_new, Te_old_x_new_y, spl_Te);
+			dx_acoustic, dy_acoustic, b2x, b2x_ac_new, /*Te_old_x_new_y,*/ spl_Te);
 
 		TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, dz_heat, Nx_part_ac + 1, Ny_part_ac + 1,
-			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, b2x, b2x_ac_new, Te_old_x_new_z, spl_Te);
+			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, b2x, b2x_ac_new, /*Te_old_x_new_z,*/ spl_Te);
 
 		/* сшивка границ скорости (1-й этап) (2-я версия)*/
-		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, b2y_ac_new, b2y, Te_old_x_new_y, spl_Te, coeff_big_z,
+		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, b2y_ac_new, b2y, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, b2y_ac_new, b2y, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, b2y_ac_new, b2y, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
 		// from ht to ac /* сшивка границ скорости (2-й этап) */
 		TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1,
-			dx_acoustic, dy_acoustic, b2y, b2y_ac_new, Te_old_x_new_y, spl_Te);
+			dx_acoustic, dy_acoustic, b2y, b2y_ac_new, /*Te_old_x_new_y,*/ spl_Te);
 
 		TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, dz_heat, Nx_part_ac + 1, Ny_part_ac + 1,
-			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, b2y, b2y_ac_new, Te_old_x_new_z, spl_Te);
+			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, b2y, b2y_ac_new, /*Te_old_x_new_z,*/ spl_Te);
 
 		/* сшивка границ скорости (1-й этап) (2-я версия)*/
-		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, b2z_ac_new, b2z, Te_old_x_new_y, spl_Te, coeff_big_z,
+		Transform_2D_GridFrom_AcToHeat_xy(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, Nx_part_ht + 1, Ny_part_ht + 1, down_boundary_z_heat + 1, dx_heat, dy_heat, b2z_ac_new, b2z, /*Te_old_x_new_y,*/ spl_Te, coeff_big_z,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat);
 
-		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, b2z_ac_new, b2z, Te_old_x_new_z, spl_Te, coeff_big_y, coeff_big_x,
+		Transform_2D_GridFrom_AcToHeat_xz(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat + 1, dx_heat, dz_heat, b2z_ac_new, b2z, /*Te_old_x_new_z,*/ spl_Te, coeff_big_y, coeff_big_x,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat);
 
 		// from ht to ac /* сшивка границ скорости (2-й этап) */
 		TransformGrid_2D_xy(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1,
-			dx_acoustic, dy_acoustic, b2z, b2z_ac_new, Te_old_x_new_y, spl_Te);
+			dx_acoustic, dy_acoustic, b2z, b2z_ac_new, /*Te_old_x_new_y,*/ spl_Te);
 
 		TransformGrid_2D_xz(left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, dx_heat, dy_heat, dz_heat, Nx_part_ac + 1, Ny_part_ac + 1,
-			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, b2z, b2z_ac_new, Te_old_x_new_z, spl_Te);
+			down_boundary_z_acoustic + 1, Nx_part_ac + 1, Ny_part_ac + 1, dx_acoustic, dy_acoustic, dz_acoustic, b2z, b2z_ac_new, /*Te_old_x_new_z,*/ spl_Te);
 
 		/*//сшивка скорости (1-й этап)
 		//TransformGridFrom_AcToHeat(Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, dx_acoustic, dy_acoustic, dz_acoustic,
@@ -5481,9 +6190,9 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 		GRU2(b2x, b2y, b2z, Nx_heat, Ny_heat, Nz_heat);
 
 		Calculation2(a1x, a1y, a1z, a2x, a2y, a2z, b2x, b2y, b2z, V2, V1, V00, e2, tmpe1, tmpi1, a1x_ac_new, a2x_ac_new, a1y_ac_new, a2y_ac_new, a1z_ac_new, a2z_ac_new, b2x_ac_new, b2y_ac_new,
-			b2z_ac_new, V2_ac_new, V1_ac_new, V00_ac_new, tmpe_ac1_new, tmpi_ac1_new, e2_ac_new, dx_heat, dy_heat, dz_heat, Nx_part_ht, Ny_part_ht, dx_acoustic, dy_acoustic, dz_acoustic, dt, CC0, Nx_heat, Ny_heat, Nz_heat,
+			b2z_ac_new, V2_ac_new, V1_ac_new, V00_ac_new, tmpe_ac1_new, tmpi_ac1_new, e2_ac_new, e1_ac_new, dx_heat, dy_heat, dz_heat, Nx_part_ht, Ny_part_ht, dx_acoustic, dy_acoustic, dz_acoustic, dt, CC0, Nx_heat, Ny_heat, Nz_heat,
 			left_boundary_x_heat, right_boundary_x_heat, left_boundary_y_heat, right_boundary_y_heat, down_boundary_z_heat, Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1,
-			V0, p0v, /*tmpe_for_transform_new, Tei_old_xy_new_z, Tei_old_y_new_xz, Te_acoustic, Tei_old_xy_new_z_for_total_ac, Tei_old_y_new_xz_for_total_ac,*/ Te_old_x_new_y, Te_old_x_new_y, Te_old_x_new_z, Te_old_x_new_z, coeff_big_x, coeff_big_y, coeff_big_z ,Melt_metal, mt, param, spl_C_e_on_T, spl_Te, spl_Ti, spl_e, current_time_frame, points_rupture_ac, points_rupture_heat, new_interv_acoustic_z, spl_C_l_on_T
+			V0, p0v, /*tmpe_for_transform_new, Tei_old_xy_new_z, Tei_old_y_new_xz, Te_acoustic, Tei_old_xy_new_z_for_total_ac, Tei_old_y_new_xz_for_total_ac,*//* Te_old_x_new_y, Te_old_x_new_y, Te_old_x_new_z, Te_old_x_new_z, */coeff_big_x, coeff_big_y, coeff_big_z ,Melt_metal, mt, param, spl_C_e_on_T, spl_Te, spl_Ti, spl_e, current_time_frame, points_rupture_ac, points_rupture_heat, new_interv_acoustic_z, spl_C_l_on_T
 			/*Nx_acoustic, Ny_acoustic, Nz_acoustic, left_boundary_x_acoustic, right_boundary_x_acoustic, left_boundary_y_acoustic, right_boundary_y_acoustic, down_boundary_z_acoustic*/);
 
 		//// для отрисоки
@@ -5918,6 +6627,13 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 			plt.SetDataOnPlot3D(18, current_time_frame, /*Te_acoustic*/ e2_ac_new, p0v_s, NULL, Ny_acoustic_show / 2, 1, 1, 1, NULL, empty, fun_on_x);
 			plt.SetDataOnPlot3D(19, current_time_frame,/* Te_acoustic*/ e2_ac_new, p0v_s, Nx_acoustic_show / 2, Ny_acoustic_show / 2, NULL, 1, 1, NULL, empty, fun_on_z);
 
+
+			plt.SetGridOnPlot3D(28, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4* dx_acoustic* r0, 1e+4* dy_acoustic* r0, 1e+4* dz_acoustic / kabs, 2, fun_on_z);
+			plt.SetDataOnPlot3D(28, current_time_frame,/* Te_acoustic*/ a2z_ac_new, pow(kabs, -1) * 1e+4, Nx_acoustic_show / 2, Ny_acoustic_show / 2, NULL, 2, 2, NULL, empty, fun_on_z);
+			//??plt.SetDataOnPlot3D(28, current_time_frame,/* Te_acoustic*/ a2z_ac_new, 1., Nx_acoustic_show / 2, Ny_acoustic_show / 2, NULL, 2, 2, NULL, empty, fun_on_z);
+
+			//plt.SetDataOnPlot1D(28, current_time_frame,/* Te_acoustic*/ a2z_ac_new, 1., Nx_acoustic_show / 2, Ny_acoustic_show / 2, NULL, 2, 2, NULL, empty, fun_on_z);
+
 			// ЗАПИСЬ ОТДЕЛЬНЫХ СЛАГАЕМЫХ УРАВНЕНИЯ СОСТОЯНИЯ МИ-ГРЮНАЙЗЕНА 
 			///spl_Te.InterpolateFast(1, tmpe2, Nx_acoustic / 2, Ny_acoustic / 2);
 		///	spl_Ti.InterpolateFast(1, tmpi2, Nx_acoustic / 2, Ny_acoustic / 2);
@@ -6021,6 +6737,11 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 			namefile.clear();
 			namefile = "P (z,mkm) " + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
 			plt.ShowDataOnPlot2D(19, false, 1, Pfs, namefile, true);
+			Sleep(1000);
+
+			namefile.clear();
+			namefile = "a2z (z,mkm) " + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
+			plt.ShowDataOnPlot2D(28, false, 2, a2z_e_l, namefile, true);
 			Sleep(1000);
 
 			current_time_frame++;
@@ -6232,6 +6953,12 @@ inline int random_ab(int a, int b, std::default_random_engine & g)
 
 int main()
 {
+
+	CreateGif2DColor(5, 650, 2000, 5, "Anim P (z,x) (13.02.2025)", "Ti(y,x)", "x,mkm", "y,mkm", false); 
+	//vector<string> leg = { "P" };
+	//CreateGif_Y_x(19, 650, 2000, 10, "Anim P (z) (13.02.2025) Y(x)", "P(z)", "z,mkm", "P, bar", leg, false);
+	system("pause");
+
 	//setlocale(LC_ALL, "rus");
 	TypeBeam tp = Gauss;
 	cout << " tp = " << tp << endl;
@@ -6632,7 +7359,6 @@ int main()
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-
 	vector<string> symbols;
 	vector<Point3D> pt;
 	ifstream fin("PointsAc4783.txt");
@@ -6684,6 +7410,59 @@ int main()
 	//namefile1 = "Anim P(z) in dif mom time";
 	//plt_P_Z.ShowDataOnPlot2D(0, 0, 10, plt_P_Z_legend, namefile1, true);
 	//namefile1.clear();
+
+
+	vector<double> data1;
+	vector<double> data2;
+	vector<double> data3;
+	vector<double> ::iterator it_db1, it_db2, it_db3;
+
+	ifstream fin_data("Data_Gif28 + 670.txt");
+	if (fin_data.is_open())
+	{
+		double x, y, z;
+		while (fin_data >> x >> y >> z)
+		{
+			//cout << x << "   " << y << "   " << z << endl;
+			data1.push_back(x);
+			data2.push_back(y);
+			data3.push_back(z);
+		}
+	}
+
+	//it_db3 = data3.begin();
+	for (it_db3 = data3.begin(); it_db3 != data3.end(); it_db3++)
+	{
+		(*it_db3) *= (1e+4);
+		//(*it_db3) /= (1e+4);
+		//(*it_db1) *= pow(5e+5, -1);
+	}
+
+	ofstream fout_data("Data_draw.txt");
+	cout << endl;
+	it_db1 = data1.begin();
+	it_db3 = data3.begin();
+	for (it_db2 = data2.begin(); it_db2 != data2.end(); it_db2++)
+	{
+		fout_data << (*it_db1) << "   " << (*it_db2) << "   " << (*it_db3) << endl;
+	//	cout << (*it_db1) << "   " << (*it_db2) << "   " << (*it_db3) << endl;
+		it_db1++;
+		it_db3++;
+	}
+
+	cout << endl;
+
+	vector<string> vv_data = { "Data_draw.txt"};
+	GnuPlot plt_a(vv_data.size(), vv_data); 
+	plt_a.SetParametrs2D(0, 2, 3, "a2z(z)", "z, mkm", "a2z, mkm");
+	//plt.SetParametrs2D(4, 1, 3, "h max(Fluence)", "F, J/m^2", "z, nm");
+
+	//string  namefile;
+	namefile.clear();
+	vector<string> Metal_a = { "Lagrange", "Euler" };
+	namefile = "Dependence a2z on z";
+	plt_a.ShowDataOnPlot2D(0, false, 2, Metal_a, namefile, true);
+	namefile.clear();
 
 	////////////////////////////////////////////////////////////////////////////////
 
