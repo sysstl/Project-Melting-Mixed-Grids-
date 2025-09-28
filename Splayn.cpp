@@ -3,8 +3,6 @@
 
 using namespace std;
 
-int count_splayn = 0;
-
 Polinomial pow(Polinomial pol, size_t power)
 {
 	Polinomial Result = pol;
@@ -158,37 +156,6 @@ void Splayn::SetInitialData(VecD X, VecD Y, VecD Z, size_t power)
 	}
 }
 
-void Splayn::InterpolateFast(size_t power, double*** Tei, int fix_x, int fix_y, int fix_z, Direction dr)
-{
-	this->_Polinoms.clear();
-	this->_Polinoms.erase(this->_Polinoms.begin(), this->_Polinoms.end());
-
-	if (dr == x)
-	{
-		for (size_t i = 0; i < this->_X.size() - 1; i++)
-		{
-			this->_Polinoms.push_back(Polinomial(VecD{ Tei[i][fix_y][fix_z] + (-this->_X[i]) * ((Tei[i + 1][fix_y][fix_z] - Tei[i][fix_y][fix_z]) / (this->_X[1] - this->_X[0])), ((Tei[i + 1][fix_y][fix_z] - Tei[i][fix_y][fix_z]) / (this->_X[1] - this->_X[0])) }));
-		}
-	}
-
-	if (dr == y)
-	{
-		for (size_t i = 0; i < this->_Y.size() - 1; i++)
-		{
-			this->_Polinoms.push_back(Polinomial(VecD{ Tei[fix_x][i][fix_z] + (-this->_Y[i]) * ((Tei[fix_x][i + 1][fix_z] - Tei[fix_x][i][fix_z]) / (this->_Y[1] - this->_Y[0])), ((Tei[fix_x][i + 1][fix_z] - Tei[fix_x][i][fix_z]) / (this->_Y[1] - this->_Y[0])) }));
-		}
-	}
-
-	if (dr == z)
-	{
-		for (size_t i = 0; i < this->_Z.size() - 1; i++)
-		{
-			this->_Polinoms.push_back(Polinomial(VecD{ Tei[fix_x][fix_y][i] + (-this->_Z[i]) * ((Tei[fix_x][fix_y][i + 1] - Tei[fix_x][fix_y][i]) / (this->_Z[1] - this->_Z[0])), ((Tei[fix_x][fix_y][i + 1] - Tei[fix_x][fix_y][i]) / (this->_Z[1] - this->_Z[0])) }));
-		}
-	}
-
-}
-
 void Splayn::InterpolateFast1D(VecD X, VecD Y)
 {
 	this->_Polinoms.clear();
@@ -246,6 +213,7 @@ void Splayn::Interpolate(VecD X, VecD Y, size_t power)
 {
 	this->_X = X;
 	this->_Polinoms.clear();
+	this->_Polinoms.erase(this->_Polinoms.begin(), this->_Polinoms.end());
 	size_t NumberOfPoints = X.size();
 	size_t size = (power + 1) * (NumberOfPoints - 1);
 	Matrix mat(size, size);
@@ -379,110 +347,4 @@ void Splayn::OutPut()
 		_Polinoms[i].OutPut();
 		std::cout << ',' << this->_X[i] << "<=x<=" << this->_X[i + 1] << "}," << '\n';
 	}
-}
-
-void Splayn::Calculation_Interpolation(string fiename)
-{
-	ifstream in(fiename); // окрываем файл для чтения
-
-	VecD X;
-	VecD Y;
-
-	if (in.is_open())
-	{
-		double x, y;
-		while (in >> x >> y)
-		{
-			/*	new_points.push_back(Point{ x, y });*/
-			X.push_back(x);
-			Y.push_back(y);
-			//cout << x << "   " << y << endl;
-		}
-	}
-	in.close();
-	//	cout << " size = " << X.size() << endl;
-		//for (int i = 0; i < new_points.size(); i++)
-		//{
-		//	X.push_back(new_points[i].x);
-		//	Y.push_back(new_points[i].y);
-		//}
-		//system("pause");
-	this->Interpolate(X, Y, 1);
-}
-
-void Splayn::Calculation_Interpolation(double*** Tei, int Nz_heat, double dz_heat, int fix_x, int fix_y)
-{
-	VecD X;
-	VecD Y;
-
-	for (int i = 0; i < Nz_heat; i++)
-	{
-		X.push_back(i * dz_heat);
-		Y.push_back(Tei[fix_x][fix_y][i]);
-	}
-
-	//cout << X.size() << endl;
-
-	this->Interpolate(X, Y, 1);
-}
-
-void Splayn::Calculation_InterpolationFast(double*** Tei, int Nz_heat, double dz_heat, int fix_x, int fix_y)
-{
-	VecD Y;
-	for (int i = 0; i < Nz_heat; i++)
-	{
-		Y.push_back(Tei[fix_x][fix_y][i]);
-	}
-
-	//this->InterpolateFast(Y, 1);
-}
-
-void Splayn::Calculation_InterpolationFast(string fiename)
-{
-	vector<Point> new_points;
-	ifstream in(fiename); // окрываем файл для чтения
-
-	VecD X;
-	VecD Y;
-
-	if (in.is_open())
-	{
-		double x, y;
-		while (in >> x >> y)
-		{
-			/*	new_points.push_back(Point{ x, y });*/
-			X.push_back(x);
-			Y.push_back(y);
-		}
-	}
-	in.close();
-
-
-	this->_X = X;
-	//this->_Polinoms.clear();
-	size_t NumberOfPoints = X.size();
-	size_t size = (1 + 1) * (X.size() - 1);
-	/*Matrixx mat(size, size);*/
-	VecD Diagonal(size, 1.0);
-	this->_Diagonal = Diagonal;
-	double dx = this->_X[1] - this->_X[0];
-	for (size_t i = 1; i < this->_Diagonal.size(); i += 2) {
-		this->_Diagonal[i] = dx;
-		/*cout << this->_Diagonal[i] << "   ";*/
-	}
-	cout << endl;
-
-	for (size_t i = 0; i < this->_Diagonal.size(); i++) {
-
-		cout << this->_Diagonal[i] << "   ";
-	}
-	cout << endl;
-
-	//for (int i = 0; i < new_points.size(); i++)
-	//{
-	//	X.push_back(new_points[i].x);
-	//	Y.push_back(new_points[i].y);
-	//}
-
-	//this->InterpolateFast(Y, 1);
 }
