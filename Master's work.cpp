@@ -5058,7 +5058,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 	double*** V00_ac_new, ***V1_ac_new, ***V2_ac_new, ***a1y_ac_new, ***a2y_ac_new, ***a1z_ac_new, ***a2z_ac_new, ***a2x_ac_new, ***a1x_ac_new, ***b1x_ac_new,
 		***b2x_ac_new, ***b1y_ac_new, ***b2y_ac_new, ***b1z_ac_new, ***b2z_ac_new, ***e2_ac_new, ***e1_ac_new, ***Tei_old_xy_new_z, ***Tei_old_y_new_xz;
 	double*** tmpe_ac0_new, ***tmpe_ac1_new, ***tmpe_ac2_new, ***tmpi_ac0_new, ***tmpi_ac1_new, ***tmpi_ac2_new;
-	double*** tmpe_for_transform_new, ***Array3D_for_Plot; // массив куда перебрасываем часть поля (например темепраутры) и эти данные пеерводим из крупной в мелкую сетку
+	double*** tmpe_for_transform_new, **Array3D_for_Plot; // массив куда перебрасываем часть поля (например темепраутры) и эти данные пеерводим из крупной в мелкую сетку
 	//double** Te_old_x_new_y, ** Te_old_x_new_z;
 
 	//Te_old_x_new_y = new double* [Nx_part_ac + 1]; 
@@ -5130,7 +5130,12 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 	e1_ac_new = new double**[Nx_part_ac + 1]; // Pressure
 	e2_ac_new = new double**[Nx_part_ac + 1]; // Pressure
 
-	Array3D_for_Plot = new double**[Nx_part_ac + 1];
+	Array3D_for_Plot = new double*[down_boundary_z_acoustic + 1];
+
+	for (int i = 0; i < down_boundary_z_acoustic + 1; i++)
+	{
+		Array3D_for_Plot[i] = new double[Nx_part_ac + 1];
+	}
 
 	for (int i = 0; i < Nx_part_ac + 1; i++)
 	{
@@ -5159,7 +5164,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 		e1_ac_new[i] = new double*[Ny_part_ac + 1]; // Pressure
 		e2_ac_new[i] = new double*[Ny_part_ac + 1]; // Pressure
 
-		Array3D_for_Plot[i] = new double*[Ny_part_ac + 1];
+		//Array3D_for_Plot[i] = new double*[Nx_part_ac + 1];
 
 		for (int j = 0; j < Ny_part_ac + 1; j++)
 		{
@@ -5188,7 +5193,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 			e1_ac_new[i][j] = new double[down_boundary_z_acoustic + 1]; // Pressure
 			e2_ac_new[i][j] = new double[down_boundary_z_acoustic + 1]; // Pressure
 
-			Array3D_for_Plot[i][j] = new double[down_boundary_z_acoustic + 1];
+			//Array3D_for_Plot[i][j] = new double[down_boundary_z_acoustic + 1];
 		}
 	}
 
@@ -5266,7 +5271,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 	SetDataArray3D(V2_ac_new, Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1, V0);
 
 	//Null_Array3D(Te_acoustic, Nx_acoustic, Ny_acoustic, Nz_acoustic);
-	Null_Array3D(Array3D_for_Plot, Nx_part_ac + 1, Ny_part_ac + 1, down_boundary_z_acoustic + 1);
+	Null_Array(Array3D_for_Plot, down_boundary_z_acoustic + 1, Nx_part_ac + 1);
 	//Null_Array3D(Ti_acoustic, Nx_acoustic, Ny_acoustic, Nz_acoustic);
 
 	for (int i = 0; i < Nx_part_ac + 1; i++)
@@ -5329,12 +5334,10 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 	int total_time_frame = 2500000;// 2000; // формальный апарметр теперь (уже)
 	vector<double> moments_time; // хранит моменты времени
 	vector<int> moments_fix_time_anim;
-	//int count_time = 1;
 	for (int i = 1; i <= 28000/*2000*/; i++) // сетка времени
 	{
 		tt = i * dt * t0 * 1e+15; // vremja v fs
 		moments_time.push_back(tt);
-		//list_namefile.push_back()
 	}
 
 	int dt_step = 5;
@@ -6015,7 +6018,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 		//if ((Te_acoustic[Nx_acoustic / 2][Ny_acoustic / 2][1] * param.T00) >= (Melt_metal[mt].T_melting + 1.)) 
 
 		// Зона плавления
-		if (/*!points_rupture_ac.empty()*/ ((*it_fix_time_anim) >= 300000) && (it_fix_time_anim != moments_fix_time_anim.end())) // Зона плавления + явление отрыва
+		if (/*!points_rupture_ac.empty()*/ ((*it_fix_time_anim) >= 30000000) && (it_fix_time_anim != moments_fix_time_anim.end())) // Зона плавления + явление отрыва
 		{
 			for (int i = 0; i < Nx_acoustic_show; i++)
 			{
@@ -6023,22 +6026,22 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 				{
 					if ((tmpi_ac2_new[i][Ny_acoustic_show / 2][k] * param.T00) >= (Melt_metal[mt].T_melting - 1.))
 					{
-						Array3D_for_Plot[i][Ny_acoustic_show / 2][k] = (Melt_metal[mt].T_melting + 200.) / param.T00;
+						Array3D_for_Plot[i][k] = (Melt_metal[mt].T_melting + 200.) / param.T00;
 					}
 
 					if (((tmpi_ac2_new[i][Ny_acoustic_show / 2][k] * param.T00) < (Melt_metal[mt].T_melting - 1.)) && ((tmpi_ac2_new[i][Ny_acoustic_show / 2][k] * param.T00) >= param.T00))
 					{
-						Array3D_for_Plot[i][Ny_acoustic_show / 2][k] = (Melt_metal[mt].T_melting * 0.5) / param.T00;
+						Array3D_for_Plot[i][k] = (Melt_metal[mt].T_melting * 0.5) / param.T00;
 					}
 
 					if ((tmpi_ac2_new[i][Ny_acoustic_show / 2][k]) == 1e-16)
 					{
-						Array3D_for_Plot[i][Ny_acoustic_show / 2][k] = 1e-16;
+						Array3D_for_Plot[i][k] = 1e-16;
 					}
 				}
 			}
 
-			plt.SetDataOnPlotColor3D(13, current_time_frame, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, /*Te_acoustic*/ Array3D_for_Plot, param.T00, Ny_acoustic_show / 2, xz);
+			plt.SetDataOnPlotColor2D(13, current_time_frame, Nz_acoustic_show, Nx_acoustic_show, 1e+4 * dz_acoustic / kabs, 1e+4 * dx_acoustic * r0, /*Te_acoustic*/ Array3D_for_Plot, param.T00);
 
 			//TransformGrid(Nx_heat, Ny_heat, Nz_heat, dx_heat, dy_heat, dz_heat, Nx_acoustic, Ny_acoustic, Nz_acoustic, dx_acoustic, dy_acoustic, dz_acoustic, tmpi2, Te_acoustic, Tei_old_xy_new_z_for_total_ac, Tei_old_y_new_xz_for_total_ac, spl_Te);
 			//Copy_Data_From_Small_Array3D_To_Big_Array3D_Withboundary(tmpi_ac2_new, Te_acoustic, left_boundary_x_acoustic, right_boundary_x_acoustic, left_boundary_y_acoustic, right_boundary_y_acoustic, down_boundary_z_acoustic);
@@ -6094,13 +6097,13 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 
 			namefile.clear();
 			namefile = "Melting zone (zx) " + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
-			///plt.ShowDataOnPlotColor(13, namefile, true);
-			Sleep(1000);
+			//plt.ShowDataOnPlotColor(13, namefile, true);
+			//Sleep(1000);
 
 			namefile.clear();
 			namefile = "Melting zone (yx) " + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
 			//plt.ShowDataOnPlotColor(14, namefile, true);
-			Sleep(1000);
+			//Sleep(1000);
 
 			/*Null_Array(massive_melting_tmp1, Nz_acoustic, Nx_acoustic);
 			Null_Array(massive_melting_tmp2, Nx_acoustic, Ny_acoustic);*/
@@ -6165,12 +6168,12 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 			namefile.clear();
 			namefile = "Preasure zone (zx) " + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
 			///	plt.ShowDataOnPlotColor(20, namefile, true);
-			Sleep(1000);
+			//Sleep(1000);
 
 			namefile.clear();
 			namefile = "Preasure zone (yx) " + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
 			///	plt.ShowDataOnPlotColor(21, namefile, true);
-			Sleep(1000);
+			//Sleep(1000);
 
 			/*Null_Array(massive_melting_tmp1, Nz_acoustic, Nx_acoustic);
 			Null_Array(massive_melting_tmp2, Nx_acoustic, Ny_acoustic);*/
@@ -6219,7 +6222,7 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 			{
 				// Ny_heat / 2 = 50   Ny_ac / 2 = 100
 				// если меняю общее кол-во линий, то меняем в методе plt.SetGridOnPlot3D
-				plt.SetDataOnPlot3D(23, current_time_frame, /*Te_acoustic*/ tmpi_ac2_new, param.T00, NULL, Ny_acoustic_show / 2, z_point, total_count_z, Ti_P_x_profile, NULL, empty, fun_on_x);
+				//plt.SetDataOnPlot3D(23, current_time_frame, /*Te_acoustic*/ tmpi_ac2_new, param.T00, NULL, Ny_acoustic_show / 2, z_point, total_count_z, Ti_P_x_profile, NULL, empty, fun_on_x);
 				Legenda_Ti_x.push_back(ConvertNumToStringdouble(1e+4 * z_point * dz_acoustic / kabs * 1000) + " nm");
 				z_point++;// = 5;// номер узла по легенде глубин (по z)
 			}
@@ -6245,17 +6248,17 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 			{
 				// Ny_heat / 2 = 50   Ny_ac / 2 = 100
 				// если меняю общее кол-во линий, то меняем в методе plt.SetGridOnPlot3D
-				plt.SetDataOnPlot3D(17, current_time_frame, /*Te_acoustic*/ e2_ac_new, p0v_s, NULL, Ny_acoustic_show / 2, z_point, total_count_z, Ti_P_x_profile, NULL, empty, fun_on_x);
+				//plt.SetDataOnPlot3D(17, current_time_frame, /*Te_acoustic*/ e2_ac_new, p0v_s, NULL, Ny_acoustic_show / 2, z_point, total_count_z, Ti_P_x_profile, NULL, empty, fun_on_x);
 				Legenda_P_x.push_back(ConvertNumToStringdouble(1e+4 * z_point * dz_acoustic / kabs * 1000) + " nm");
 				z_point++;// = 5;// номер узла по легенде глубин (по z)
 			}
 
 			namefile.clear();
-			namefile = "Ti (x,mkm) Legenda z" + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
+			namefile = "P (x,mkm) Legenda z" + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
 			//plt.ShowDataOnPlot2D(17, false, 10, Legenda_Ti_x, namefile, true);
 			//Sleep(1000);
 			namefile.clear();
-			namefile = "P (x,mkm) Legenda z" + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
+			namefile = "Ti (x,mkm) Legenda z" + metall + "," + type_beam + ", pulse duration = " + ConvertNumToStringdouble(tp * 1e+15) + "fs, moment time = " + ConvertNumToStringdouble(tt) + "fs";
 			//plt.ShowDataOnPlot2D(23, false, 10, Legenda_P_x, namefile, true);
 			//Sleep(1000);
 
@@ -6319,34 +6322,32 @@ void MainProcedure(Metal mt, TypeBeam tbeam, double kte_kte, double ro0, double 
 
 			namefile.clear();
 
-			// отрисовка температуры в акуст сетке
-			plt.SetGridOnPlot3D(15, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, 2, fun_on_x);
-			plt.SetGridOnPlot3D(16, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, 2, fun_on_z);
-
 			// отрисовка температуры в тепл сетке
 			/*plt.SetGridOnPlot3D(15, Nx_heat, Ny_heat, Nz_heat, 1e+4 * dx_heat * r0, 1e+4 * dy_heat * r0, 1e+4 * dz_heat / kabs, 2, fun_on_x);
 			plt.SetGridOnPlot3D(16, Nx_heat, Ny_heat, Nz_heat, 1e+4 * dx_heat * r0, 1e+4 * dy_heat * r0, 1e+4 * dz_heat / kabs, 2, fun_on_z);*/
-
-			plt.SetGridOnPlot3D(18, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, 1, fun_on_x);
-			plt.SetGridOnPlot3D(19, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, 1, fun_on_z);
 
 			// отрисовка температуры в акуст сетке
 
 			//TransformGrid(Nx_heat, Ny_heat, Nz_heat, dx_heat, dy_heat, dz_heat, Nx_acoustic, Ny_acoustic, Nz_acoustic, dx_acoustic, dy_acoustic, dz_acoustic, tmpe2, Te_acoustic, Tei_old_xy_new_z_for_total_ac, Tei_old_y_new_xz_for_total_ac, spl_Te);
 			//Copy_Data_From_Small_Array3D_To_Big_Array3D_Withboundary(tmpe_ac2_new, Te_acoustic, left_boundary_x_acoustic, right_boundary_x_acoustic, left_boundary_y_acoustic, right_boundary_y_acoustic, down_boundary_z_acoustic);
 
+			// отрисовка температуры в акуст сетке
+			plt.SetGridOnPlot3D(15, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, 2, fun_on_x);
+			plt.SetGridOnPlot3D(16, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, 2, fun_on_z);
 			plt.SetDataOnPlot3D(15, current_time_frame, /*Te_acoustic*/ tmpe_ac2_new, param.T00, NULL, Ny_acoustic_show / 2, 1, 2, 1, NULL, empty, fun_on_x);
 			plt.SetDataOnPlot3D(16, current_time_frame, /*Te_acoustic*/ tmpe_ac2_new, param.T00, Nx_acoustic_show / 2, Ny_acoustic_show / 2, NULL, 2, 1, NULL, empty, fun_on_z);
+			plt.SetDataOnPlot3D(15, current_time_frame, /*Te_acoustic*/ tmpi_ac2_new, param.T00, NULL, Ny_acoustic_show / 2, 1, 2, 2, NULL, empty, fun_on_x);
+			plt.SetDataOnPlot3D(16, current_time_frame, /*Te_acoustic*/ tmpi_ac2_new, param.T00, Nx_acoustic_show / 2, Ny_acoustic_show / 2, NULL, 2, 2, NULL, empty, fun_on_z);
+
 
 			//TransformGrid(Nx_heat, Ny_heat, Nz_heat, dx_heat, dy_heat, dz_heat, Nx_acoustic, Ny_acoustic, Nz_acoustic, dx_acoustic, dy_acoustic, dz_acoustic, tmpi2, Te_acoustic, Tei_old_xy_new_z_for_total_ac, Tei_old_y_new_xz_for_total_ac, spl_Te);
 			//Copy_Data_From_Small_Array3D_To_Big_Array3D_Withboundary(tmpi_ac2_new, Te_acoustic, left_boundary_x_acoustic, right_boundary_x_acoustic, left_boundary_y_acoustic, right_boundary_y_acoustic, down_boundary_z_acoustic);
 
-			plt.SetDataOnPlot3D(15, current_time_frame, /*Te_acoustic*/ tmpi_ac2_new, param.T00, NULL, Ny_acoustic_show / 2, 1, 2, 2, NULL, empty, fun_on_x);
-			plt.SetDataOnPlot3D(16, current_time_frame, /*Te_acoustic*/ tmpi_ac2_new, param.T00, Nx_acoustic_show / 2, Ny_acoustic_show / 2, NULL, 2, 2, NULL, empty, fun_on_z);
-
 			//TransformGrid(Nx_heat, Ny_heat, Nz_heat, dx_heat, dy_heat, dz_heat, Nx_acoustic, Ny_acoustic, Nz_acoustic, dx_acoustic, dy_acoustic, dz_acoustic, e2, Te_acoustic, Tei_old_xy_new_z_for_total_ac, Tei_old_y_new_xz_for_total_ac, spl_Te);
 		//	Copy_Data_From_Small_Array3D_To_Big_Array3D_Withboundary(e2_ac_new, Te_acoustic, left_boundary_x_acoustic, right_boundary_x_acoustic, left_boundary_y_acoustic, right_boundary_y_acoustic, down_boundary_z_acoustic);
 
+			plt.SetGridOnPlot3D(18, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, 1, fun_on_x);
+			plt.SetGridOnPlot3D(19, Nx_acoustic_show, Ny_acoustic_show, Nz_acoustic_show, 1e+4 * dx_acoustic * r0, 1e+4 * dy_acoustic * r0, 1e+4 * dz_acoustic / kabs, 1, fun_on_z);
 			plt.SetDataOnPlot3D(18, current_time_frame, /*Te_acoustic*/ e2_ac_new, p0v_s, NULL, Ny_acoustic_show / 2, 1, 1, 1, NULL, empty, fun_on_x);
 			plt.SetDataOnPlot3D(19, current_time_frame,/* Te_acoustic*/ e2_ac_new, p0v_s, Nx_acoustic_show / 2, Ny_acoustic_show / 2, NULL, 1, 1, NULL, empty, fun_on_z);
 
@@ -6654,8 +6655,8 @@ int main()
 	int Ny_heat = 100;// 100;// dxy;// 100// 100; // chislo uzlov po y //100
 	int Nz_heat = 250;// 250;//250; //!!!!!!!!!!!!!!
 
-	int Nx_acoustic = 400;// 500;//200;// 200;//400; //dxy; // 100 //100; // chislo uzlov po x // 100
-	int Ny_acoustic = 400;// 500;// 200;// 200;// 400;// dxy;// 100// 100; // chislo uzlov po y //100
+	int Nx_acoustic = 200;// 500;//200;// 200;//400; //dxy; // 100 //100; // chislo uzlov po x // 100
+	int Ny_acoustic = 200;// 500;// 200;// 200;// 400;// dxy;// 100// 100; // chislo uzlov po y //100
 	int Nz_acoustic = 2000;// 400;// 400;// 10000; // !!!!!!
 
 	double*** V00, *** V1, *** V2, *** a1y, *** a2y, *** a1z, *** a2z, *** a2x,
@@ -7214,5 +7215,6 @@ int main()
 	system("pause");
 	return 0;
 }
+
 
 
