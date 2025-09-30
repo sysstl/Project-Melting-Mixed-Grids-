@@ -49,7 +49,7 @@ public:
 	GnuPlot(int number_of_plots_); // наш объект состоит из нескольких плотов // ++++++++++++++++++
 
 	// используется для статических картинок и анимации
-	GnuPlot(int number_of_plots_, int count_frame);
+	//GnuPlot(int number_of_plots_, int count_frame);
 
 	// конструктор для создания плотиков в которых будем отображать экспериментальные данные лежащие в файлах изначально
 	GnuPlot(int number_of_plots_, vector<string> filename_);
