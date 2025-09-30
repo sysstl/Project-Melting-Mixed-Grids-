@@ -57,18 +57,18 @@ GnuPlot::GnuPlot(int number_of_plots_)
 	number_of_plots = number_of_plots_;
 	Matrix matr(0, 0);
 
-	string text;
 	FILE* gnuplotPipe_tmp;
 	FILE* gnuplotPipe_tmp_Gif;
 	for (int i = 0; i < number_of_plots; ++i)
 	{
-		int length = snprintf(NULL, 0, "%i", i);
+		string text = ConvertNumToStringint_1(i);
+		/*int length = snprintf(NULL, 0, "%i", i);
 		char* str = new char[length + 1];
 		snprintf(str, length + 1, "%i", i);
 		for (int j = 0; j < length; j++)
 		{
 			text.push_back(str[j]);
-		}
+		}*/
 
 		string file_name = "gnuplot" + text + ".txt";
 		text.clear();
@@ -86,7 +86,7 @@ GnuPlot::GnuPlot(int number_of_plots_)
 	}
 }
 
-GnuPlot::GnuPlot(int number_of_plots_, int count_frame_)
+/*GnuPlot::GnuPlot(int number_of_plots_, int count_frame_)
 {
 	number_of_plots = number_of_plots_;
 	count_frame = count_frame_;
@@ -140,7 +140,7 @@ GnuPlot::GnuPlot(int number_of_plots_, int count_frame_)
 	//		int j = 0;
 	//		//for (int j = 0; j < count_frame_; ++j)
 	//		{
-	//			string number_frame_Gif /*= "GIF"*/;
+	//			string number_frame_Gif /*= "GIF";
 
 	//			int length = snprintf(NULL, 0, "%i", j);
 	//			char* str = new char[length + 1];
@@ -169,7 +169,7 @@ GnuPlot::GnuPlot(int number_of_plots_, int count_frame_)
 			//P_xyzt_Gif.push_back(matr);
 	//	}
 	//}
-}
+}*/
 
 GnuPlot::GnuPlot(int number_of_plots_, vector<string> filename_)
 {
@@ -204,26 +204,26 @@ void GnuPlot::SetParametrs2D(int Current_number_plot, int number_of_lines, int w
 	//fprintf(gnuplotPipe[Current_number_plot], "set xrange [%lf:%lf]\n", 0., 50.); 
 	//fprintf(gnuplotPipe[Current_number_plot], "set yrange [%lf:%lf]\n", 0., 50.);
 
-	string tmp_width_line;
-	int length = snprintf(NULL, 0, "%i", width_line);
+	string tmp_width_line = ConvertNumToStringint_1(width_line);
+	/*int length = snprintf(NULL, 0, "%i", width_line);
 	char* str = new char[length + 1];
 	snprintf(str, length + 1, "%i", width_line);
 	for (int j = 0; j < length; j++)
 	{
 		tmp_width_line.push_back(str[j]);
-	}
+	}*/
 	string color;
 
 	for (int i = 1; i <= number_of_lines; i++) // number_of_lines - число линий на плоте, 
 	{
-		string tmp_num_line;
-		int length = snprintf(NULL, 0, "%i", i);
-		char* str = new char[length + 1];
-		snprintf(str, length + 1, "%i", i);
-		for (int j = 0; j < length; j++)
-		{
-			tmp_num_line.push_back(str[j]); // номер линии это уже строка
-		}
+		string tmp_num_line = ConvertNumToStringint_1(i);
+		//int length = snprintf(NULL, 0, "%i", i);
+		//char* str = new char[length + 1];
+		//snprintf(str, length + 1, "%i", i);
+		//for (int j = 0; j < length; j++)
+		//{
+		//	tmp_num_line.push_back(str[j]); // номер линии это уже строка
+		//}
 
 		if (i == 1)
 		{
@@ -419,65 +419,67 @@ void GnuPlot::SetGridOnPlot3D(int Current_number_plot, int Nx, int Ny, int Nz, d
 		//Matrix mtr1(Nx, number_of_lines + 1);
 		//P_xyzt[Current_number_plot] = mtr1; // рабочий вариант
 		P_xyzt[Current_number_plot].Resize(Nx, number_of_lines + 1);// если out of range  будет то еще на 1 добавим
+		P_xyzt_Gif[Current_number_plot].Resize(Nx, number_of_lines + 1);
 
 		for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
 		{
 			P_xyzt[Current_number_plot][i][0] = i * dx;
+			P_xyzt_Gif[Current_number_plot][i][0] = i * dx;
 		}
-
 
 		//if (count_frame != 0)
-		{
-			P_xyzt_Gif[Current_number_plot].Resize(Nx, number_of_lines + 1);// если out of range  будет то еще на 1 добавим
+		//{
+		//	P_xyzt_Gif[Current_number_plot].Resize(Nx, number_of_lines + 1);// если out of range  будет то еще на 1 добавим
 
-			for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
-			{
-				P_xyzt_Gif[Current_number_plot][i][0] = i * dx;
-			}
-		}
+		//	for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
+		//	{
+		//		P_xyzt_Gif[Current_number_plot][i][0] = i * dx;
+		//	}
+		//}
 	}
 
 	if (prof == fun_on_y)
 	{
 		P_xyzt[Current_number_plot].Resize(Ny, number_of_lines + 1);
+		P_xyzt_Gif[Current_number_plot].Resize(Ny, number_of_lines + 1);
 
 		for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
 		{
 			P_xyzt[Current_number_plot][i][0] = i * dy;
+			P_xyzt_Gif[Current_number_plot][i][0] = i * dy;
 		}
 
-
 		//if (count_frame != 0)
-		{
+		/*{
 			P_xyzt_Gif[Current_number_plot].Resize(Ny, number_of_lines + 1);
 
 			for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
 			{
 				P_xyzt_Gif[Current_number_plot][i][0] = i * dy;
 			}
-		}
+		}*/
 	}
 
 	if (prof == fun_on_z)
 	{
 		P_xyzt[Current_number_plot].Resize(Nz, number_of_lines + 1);
+		P_xyzt_Gif[Current_number_plot].Resize(Nz, number_of_lines + 1);
 
 		for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
 		{
 			P_xyzt[Current_number_plot][i][0] = i * dz;
+			P_xyzt_Gif[Current_number_plot][i][0] = i * dz;
 		}
 
 		//if (count_frame != 0)
-		{
+		/*{
 			P_xyzt_Gif[Current_number_plot].Resize(Nz, number_of_lines + 1);
 
 			for (size_t i = 0; i < P_xyzt[Current_number_plot].GetRows(); i++)
 			{
 				P_xyzt_Gif[Current_number_plot][i][0] = i * dz;
 			}
-		}
-
-
+		}*/
 
 		if (Current_number_plot == 28) // сделано под конкретную задачу
 		{
@@ -619,6 +621,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 		{
 			for (size_t j = 0; j < P_xyzt[Current_number_plot].GetRows(); j++) {
 				P_xyzt[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[j][fixed_point_on_axis_y][fixed_point_on_axis_z];
+				P_xyzt_Gif[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[j][fixed_point_on_axis_y][fixed_point_on_axis_z];
 			}
 			if (current_number_of_line == number_of_lines)
 			{
@@ -627,36 +630,38 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 					for (int j = 0; j < number_of_lines + 1; j++)
 					{
 						file[Current_number_plot] << P_xyzt[Current_number_plot][i][j] << "   ";
+						file_anim << P_xyzt_Gif[Current_number_plot][i][j] << "   ";
 					}
 					file[Current_number_plot] << endl;
+					file_anim << endl;
 				}
 			}
 		}
 
 		//для анимаци
 		//if (count_frame != 0)
-		{
-			if (current_number_of_line <= number_of_lines)
-			{
-				for (size_t j = 0; j < P_xyzt_Gif[Current_number_plot].GetRows(); j++) {
-					P_xyzt_Gif[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[j][fixed_point_on_axis_y][fixed_point_on_axis_z];
-				}
-				if (current_number_of_line == number_of_lines)
-				{
-					// sprintf('Data_Gif" + type_plot_Gif + " + " + "%%d" + ".txt', i)
-					//file_Gif[Current_number_plot].open("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
-					for (int i = 0; i < P_xyzt_Gif[Current_number_plot].GetRows(); i++)
-					{
-						for (int j = 0; j < number_of_lines + 1; j++)
-						{
-							file_anim << P_xyzt_Gif[Current_number_plot][i][j] << "   ";
-						}
-						file_anim << endl;
-					}
+		//{
+		//	if (current_number_of_line <= number_of_lines)
+		//	{
+		//		for (size_t j = 0; j < P_xyzt_Gif[Current_number_plot].GetRows(); j++) {
+		//			P_xyzt_Gif[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[j][fixed_point_on_axis_y][fixed_point_on_axis_z];
+		//		}
+		//		if (current_number_of_line == number_of_lines)
+		//		{
+		//			// sprintf('Data_Gif" + type_plot_Gif + " + " + "%%d" + ".txt', i)
+		//			//file_Gif[Current_number_plot].open("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
+		//			for (int i = 0; i < P_xyzt_Gif[Current_number_plot].GetRows(); i++)
+		//			{
+		//				for (int j = 0; j < number_of_lines + 1; j++)
+		//				{
+		//					file_anim << P_xyzt_Gif[Current_number_plot][i][j] << "   ";
+		//				}
+		//				file_anim << endl;
+		//			}
 
-				}
-			}
-		}
+		//		}
+		//	}
+		//}
 
 		if (Current_number_plot == 0 || Current_number_plot == 22)
 		{
@@ -669,7 +674,6 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 			//ofstream file_anim("e(xy) z(index) = " + z_str + " + " + current_count_frame_str + ".txt");
 
 		}
-
 	}
 
 	if (prof == fun_on_y)
@@ -679,6 +683,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 		{
 			for (size_t j = 0; j < P_xyzt[Current_number_plot].GetRows(); j++) {
 				P_xyzt[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[fixed_point_on_axis_x][j][fixed_point_on_axis_z];
+				P_xyzt_Gif[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[fixed_point_on_axis_x][j][fixed_point_on_axis_z];
 			}
 			if (current_number_of_line == number_of_lines)
 			{
@@ -687,16 +692,17 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 					for (int j = 0; j < number_of_lines + 1; j++)
 					{
 						file[Current_number_plot] << P_xyzt[Current_number_plot][i][j] << "   ";
+						file_anim << P_xyzt_Gif[Current_number_plot][i][j] << "   ";
 					}
 					file[Current_number_plot] << endl;
+					file_anim << endl;
 				}
 			}
 		}
 
-
 		//для анимаци
 		//if (count_frame != 0)
-		{
+		/*{
 			if (current_number_of_line <= number_of_lines)
 			{
 				for (size_t j = 0; j < P_xyzt_Gif[Current_number_plot].GetRows(); j++) {
@@ -714,7 +720,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 	if (prof == fun_on_z)
@@ -723,6 +729,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 		{
 			for (size_t j = 0; j < P_xyzt[Current_number_plot].GetRows(); j++) {
 				P_xyzt[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[fixed_point_on_axis_x][fixed_point_on_axis_y][j];
+				P_xyzt_Gif[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[fixed_point_on_axis_x][fixed_point_on_axis_y][j];
 			}
 			if (current_number_of_line == number_of_lines)
 			{
@@ -731,15 +738,16 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 					for (int j = 0; j < number_of_lines + 1; j++)
 					{
 						file[Current_number_plot] << P_xyzt[Current_number_plot][i][j] << "   ";
+						file_anim << P_xyzt_Gif[Current_number_plot][i][j] << "   ";
 					}
 					file[Current_number_plot] << endl;
+					file_anim << endl;
 				}
 			}
 		}
 
 		//if (count_frame != 0)
-		{
-			if (current_number_of_line <= number_of_lines)
+		/*if (current_number_of_line <= number_of_lines)
 			{
 				for (size_t j = 0; j < P_xyzt_Gif[Current_number_plot].GetRows(); j++) {
 					P_xyzt_Gif[Current_number_plot][j][current_number_of_line] = parametr_for_dimension * fun_dimensionless[fixed_point_on_axis_x][fixed_point_on_axis_y][j];
@@ -755,22 +763,24 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 						file_anim << endl;
 					}
 				}
-			}
-		}
+			}*/
+		
 	}
 
 	if (prof == fun_on_t)
 	{
 		//  moment_of_time - размерна величина
 		file[Current_number_plot] << moment_of_time << "   ";
+		file_anim << moment_of_time << "   ";
 		for (int i = 0; i < vec.size(); i++)
 		{
 			file[Current_number_plot] << parametr_for_dimension * vec[i][fixed_point_on_axis_x][fixed_point_on_axis_y][fixed_point_on_axis_z] << "   ";
+			file_anim << parametr_for_dimension * vec[i][fixed_point_on_axis_x][fixed_point_on_axis_y][fixed_point_on_axis_z] << "   ";
 		}
 		file[Current_number_plot] << endl;
+		file_anim << endl;
 
-
-		if (count_frame != 0)
+		/*if (count_frame != 0)
 		{
 			file_anim << moment_of_time << "   ";
 			for (int i = 0; i < vec.size(); i++)
@@ -778,7 +788,7 @@ void GnuPlot::SetDataOnPlot3D(int Current_number_plot, int current_count_frame, 
 				file_anim << parametr_for_dimension * vec[i][fixed_point_on_axis_x][fixed_point_on_axis_y][fixed_point_on_axis_z] << "   ";
 			}
 			file_anim << endl;
-		}
+		}*/
 	}
 }
 
@@ -804,27 +814,23 @@ void GnuPlot::SetDataOnPlotColor3D(int Current_number_plot, int current_count_fr
 				}
 		}
 		else*/
-		{
-			//if (Current_number_plot != 21)
-			{
-				for (size_t i = 0; i < Nx; i++)
-					for (size_t j = 0; j < Ny; j++) {
-						file[Current_number_plot] << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun_dimensionless[i][j][fixed_point_on_axis] << endl;
-					}
+			
+		for (size_t i = 0; i < Nx; i++)
+			for (size_t j = 0; j < Ny; j++) {
+				file[Current_number_plot] << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun_dimensionless[i][j][fixed_point_on_axis] << endl;
+				file_anim << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun_dimensionless[i][j][fixed_point_on_axis] << endl;
+			}
 
 				//if (count_frame != 0)
-				{
-					//cout << "hello ANIMATE " << endl;
-					//cout << "Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt" << endl;
-					//file_Gif[Current_number_plot].open("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
-					for (size_t i = 0; i < Nx; i++)
-						for (size_t j = 0; j < Ny; j++) {
-							file_anim << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun_dimensionless[i][j][fixed_point_on_axis] << endl;
-						}
-				}
-			}
-		}
-
+				//{
+				//	//cout << "hello ANIMATE " << endl;
+				//	//cout << "Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt" << endl;
+				//	//file_Gif[Current_number_plot].open("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
+				//	for (size_t i = 0; i < Nx; i++)
+				//		for (size_t j = 0; j < Ny; j++) {
+				//			file_anim << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun_dimensionless[i][j][fixed_point_on_axis] << endl;
+				//		}
+				//}
 
 		//if (Current_number_plot == 5)
 		//{
@@ -849,16 +855,17 @@ void GnuPlot::SetDataOnPlotColor3D(int Current_number_plot, int current_count_fr
 		for (size_t i = 0; i < Nx; i++)
 			for (size_t j = 0; j < Nz; j++) {
 				file[Current_number_plot] << j * dz << "   " << i * dx << "   " << parametr_for_dimension * fun_dimensionless[i][fixed_point_on_axis][j] << endl;
+				file_anim << j * dz << "   " << i * dx << "   " << parametr_for_dimension * fun_dimensionless[i][fixed_point_on_axis][j] << endl;
 			}
 
 		//if (count_frame != 0)
-		{
-			//file_Gif[Current_number_plot].open("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
-			for (size_t i = 0; i < Nx; i++)
-				for (size_t j = 0; j < Nz; j++) {
-					file_anim << j * dz << "   " << i * dx << "   " << parametr_for_dimension * fun_dimensionless[i][fixed_point_on_axis][j] << endl;
-				}
-		}
+		//{
+		//	//file_Gif[Current_number_plot].open("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
+		//	for (size_t i = 0; i < Nx; i++)
+		//		for (size_t j = 0; j < Nz; j++) {
+		//			file_anim << j * dz << "   " << i * dx << "   " << parametr_for_dimension * fun_dimensionless[i][fixed_point_on_axis][j] << endl;
+		//		}
+		//}
 	}
 
 	if (plane == yz)
@@ -866,16 +873,17 @@ void GnuPlot::SetDataOnPlotColor3D(int Current_number_plot, int current_count_fr
 		for (size_t i = 0; i < Ny; i++)
 			for (size_t j = 0; j < Nz; j++) {
 				file[Current_number_plot] << j * dz << "   " << i * dy << "   " << parametr_for_dimension * fun_dimensionless[fixed_point_on_axis][i][j] << endl;
+				file_anim << j * dz << "   " << i * dy << "   " << parametr_for_dimension * fun_dimensionless[fixed_point_on_axis][i][j] << endl;
 			}
 
 		//if (count_frame != 0)
-		{
-			//file_Gif[Current_number_plot].open("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
-			for (size_t i = 0; i < Ny; i++)
-				for (size_t j = 0; j < Nz; j++) {
-					file_anim << j * dz << "   " << i * dy << "   " << parametr_for_dimension * fun_dimensionless[fixed_point_on_axis][i][j] << endl;
-				}
-		}
+		//{
+		//	//file_Gif[Current_number_plot].open("Data_Gif" + type_plot_Gif + " + " + current_count_frame_str + ".txt");
+		//	for (size_t i = 0; i < Ny; i++)
+		//		for (size_t j = 0; j < Nz; j++) {
+		//			file_anim << j * dz << "   " << i * dy << "   " << parametr_for_dimension * fun_dimensionless[fixed_point_on_axis][i][j] << endl;
+		//		}
+		//}
 	}
 }
 
@@ -887,15 +895,16 @@ void GnuPlot::SetDataOnPlotColor2D(int Current_number_plot, int current_count_fr
 	for (size_t i = 0; i < Nx; i++)
 		for (size_t j = 0; j < Ny; j++) {
 			file[Current_number_plot] << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun[i][j] << endl;
+			file_anim << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun[i][j] << endl;
 		}
 
 	//if (count_frame != 0)
-	{
-		for (size_t i = 0; i < Nx; i++)
-			for (size_t j = 0; j < Ny; j++) {
-				file_anim << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun[i][j] << endl;
-			}
-	}
+	//{
+	//	for (size_t i = 0; i < Nx; i++)
+	//		for (size_t j = 0; j < Ny; j++) {
+	//			//file_anim << i * dx << "   " << j * dy << "   " << parametr_for_dimension * fun[i][j] << endl;
+	//		}
+	//}
 
 	//if (Current_number_plot == 21)
 	//{
@@ -929,15 +938,16 @@ void GnuPlot::ShowDataOnPlot2D(int Current_number_plot, bool DataFromDiffFiles, 
 		string str_str = "plot ";
 		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - число линий на плоте, 
 		{
-			string tmp_num_line;
+			string tmp_num_line = ConvertNumToStringint(i);
 
-			int length = snprintf(NULL, 0, "%i", i + 1);
-			char* str = new char[length + 1];
-			snprintf(str, length + 1, "%i", i + 1);
-			for (int j = 0; j < length; j++)
-			{
-				tmp_num_line.push_back(str[j]); // номер столбца
-			}
+			//int length = snprintf(NULL, 0, "%i", i + 1);
+			//char* str = new char[length + 1];
+			//snprintf(str, length + 1, "%i", i + 1);
+			//for (int j = 0; j < length; j++)
+			//{
+			//	tmp_num_line.push_back(str[j]); // номер столбца
+			//}
+
 			// string name_line - назваие линии в легенде (например когда рисуем значение давлен от икса в различные моменты времени )
 			string name_line = list_name_line[i - 1]; // если не заработает, то ужно строки в сишные переводить .c_str(), а стринг это C++
 			if (DataFromDiffFiles)
@@ -961,15 +971,16 @@ void GnuPlot::ShowDataOnPlot2D(int Current_number_plot, bool DataFromDiffFiles, 
 		string str_str = "plot ";
 		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - число линий на плоте, 
 		{
-			string tmp_num_line;
+			string tmp_num_line = ConvertNumToStringint(i);
 
-			int length = snprintf(NULL, 0, "%i", i + 1);
-			char* str = new char[length + 1];
-			snprintf(str, length + 1, "%i", i + 1);
-			for (int j = 0; j < length; j++)
-			{
-				tmp_num_line.push_back(str[j]); // номер столбца
-			}
+			//int length = snprintf(NULL, 0, "%i", i + 1);
+			//char* str = new char[length + 1];
+			//snprintf(str, length + 1, "%i", i + 1);
+			//for (int j = 0; j < length; j++)
+			//{
+			//	tmp_num_line.push_back(str[j]); // номер столбца
+			//}
+
 			// string name_line - назваие линий в легенде 
 			string name_line = list_name_line[i - 1];
 			if (DataFromDiffFiles)
@@ -1000,26 +1011,26 @@ void GnuPlot::CreateGifOnPlot2D(int Current_number_plot, int number_of_lines, in
 		fprintf(gnuplotPipe_Gif[Current_number_plot], "set macros\n"); // для задания строковой переменной
 		str_str_str.clear();
 
-		string tmp_width_line;
-		int length = snprintf(NULL, 0, "%i", width_line);
+		string tmp_width_line = ConvertNumToStringint_1(width_line);
+		/*int length = snprintf(NULL, 0, "%i", width_line);
 		char* str = new char[length + 1];
 		snprintf(str, length + 1, "%i", width_line);
 		for (int j = 0; j < length; j++)
 		{
 			tmp_width_line.push_back(str[j]);
-		}
+		}*/
 		string color;
 
 		for (int i = 1; i <= number_of_lines; i++) // number_of_lines - число линий на плоте, 
 		{
-			string tmp_num_line;
-			int length = snprintf(NULL, 0, "%i", i);
-			char* str = new char[length + 1];
-			snprintf(str, length + 1, "%i", i);
-			for (int j = 0; j < length; j++)
-			{
-				tmp_num_line.push_back(str[j]); // номер линии это уже строка
-			}
+			string tmp_num_line = ConvertNumToStringint_1(i);
+			//int length = snprintf(NULL, 0, "%i", i);
+			//char* str = new char[length + 1];
+			//snprintf(str, length + 1, "%i", i);
+			//for (int j = 0; j < length; j++)
+			//{
+			//	tmp_num_line.push_back(str[j]); // номер линии это уже строка
+			//}
 
 			if (i == 1)
 			{
@@ -1332,7 +1343,6 @@ void GnuPlot::Close_all_files_and_plots(int number_of_plots_)
 	}
 }
 
-
 string GnuPlot::GetGPPath()
 {
 	return "\"C:\\Program Files\\gnuplot\\bin\\gnuplot\""; // где расположена программа
@@ -1347,4 +1357,5 @@ size_t GnuPlot::GetTermnalWidth() //ширина экрана
 {
 	return 650;
 }
+
 
